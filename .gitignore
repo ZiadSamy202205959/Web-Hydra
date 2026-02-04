@@ -26,6 +26,7 @@ trainenv/
 venv/
 ENV/
 env/
+HYDRA_Website/backend/.env
 
 # Node.js
 node_modules/
