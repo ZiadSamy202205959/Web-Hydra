@@ -44,3 +44,5 @@ debug.log
 # OS Files
 .DS_Store
 Thumbs.db
+/juice-shop
+/PayloadsAllTheThings
