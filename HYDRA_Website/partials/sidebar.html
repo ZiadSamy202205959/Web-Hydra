@@ -1,0 +1,105 @@
+<!--
+  Sidebar Partial
+
+  This file contains the navigation sidebar used across all pages of the
+  Web Hydra interface. It is loaded asynchronously via the `loadSidebar`
+  helper in app.js and injected into the `<aside id="sidebar">` element.
+
+  Modifying this file will update the sidebar everywhere it is used.
+-->
+<div class="flex flex-col h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+  <!-- Logo / brand area -->
+  <div class="flex items-center justify-center h-24 border-b border-gray-200 dark:border-gray-700 shrink-0">
+    <!-- Increase the logo size to improve clarity. The `logo-glow` class
+         applies a subtle drop shadow defined in style.css. -->
+    <img src="assets/images/web-hydra-logo.png" alt="Web Hydra Logo" class="w-20 h-20 logo-glow">
+  </div>
+  <!-- Navigation links -->
+  <nav class="flex-1 overflow-y-auto py-4">
+    <ul class="space-y-2">
+      <li>
+        <a href="index.html"
+          class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
+          data-view="dashboard">
+          <i data-feather="home" class="mr-3"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a href="threat-monitor.html"
+          class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
+          data-view="threat">
+          <i data-feather="activity" class="mr-3"></i>
+          <span>Threat Monitor</span>
+        </a>
+      </li>
+      <!-- New Threat Intelligence link. Visible to all roles permitted via rolePermissions. -->
+      <li>
+        <a href="threat-intelligence.html"
+          class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
+          data-view="intelligence">
+          <!-- Use the 'target' icon to represent intelligence feeds -->
+          <i data-feather="target" class="mr-3"></i>
+          <span>Threat Intelligence</span>
+        </a>
+      </li>
+      <li>
+        <a href="rules-policies.html"
+          class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
+          data-view="rules">
+          <i data-feather="shield" class="mr-3"></i>
+          <span>Rules &amp; Policies</span>
+        </a>
+      </li>
+      <li>
+        <a href="logs.html"
+          class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
+          data-view="logs">
+          <i data-feather="file-text" class="mr-3"></i>
+          <span>Logs</span>
+        </a>
+      </li>
+      <li>
+        <a href="test.html"
+          class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
+          data-view="test">
+          <i data-feather="play-circle" class="mr-3"></i>
+          <span>WAF Test Suite</span>
+        </a>
+      </li>
+      <li>
+        <a href="learning-loop.html"
+          class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
+          data-view="learning">
+          <i data-feather="refresh-cw" class="mr-3"></i>
+          <span>Learning Loop</span>
+        </a>
+      </li>
+      <li>
+        <a href="recommendations.html"
+          class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
+          data-view="recommendations">
+          <i data-feather="thumbs-up" class="mr-3"></i>
+          <span>Recommendations</span>
+        </a>
+      </li>
+      <!-- User management link. Visibility is controlled in app.js based on the role. -->
+      <li>
+        <a href="users.html"
+          class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
+          data-view="users">
+          <i data-feather="users" class="mr-3"></i>
+          <span>User Management</span>
+        </a>
+      </li>
+      <li>
+        <a href="settings.html"
+          class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition"
+          data-view="settings">
+          <i data-feather="settings" class="mr-3"></i>
+          <span>Settings</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>

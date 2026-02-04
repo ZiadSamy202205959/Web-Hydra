@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Hydra – Login</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Feather Icons -->
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js"></script>
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+
+<body
+  class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 flex items-center justify-center min-h-screen antialiased p-4">
+
+  <!-- Theme toggle button -->
+  <button id="theme-toggle"
+    class="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none transition-colors"
+    aria-label="Toggle theme">
+    <i data-feather="sun" class="w-5 h-5"></i>
+  </button>
+
+  <div class="w-full max-w-sm">
+    <div
+      class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl w-full space-y-6 border border-gray-200 dark:border-gray-700 relative overflow-hidden">
+
+      <!-- Decorative top border -->
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-teal-500 to-blue-600"></div>
+
+      <!-- Branding -->
+      <div class="flex flex-col items-center">
+        <div class="relative mb-4 group">
+          <div
+            class="absolute -inset-1 bg-gradient-to-r from-teal-600 to-blue-600 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000">
+          </div>
+          <img src="assets/images/web-hydra-logo.png" alt="Web Hydra Logo"
+            class="relative w-24 h-24 logo-glow rounded-full bg-white dark:bg-gray-900 p-2">
+        </div>
+        <h1 class="text-2xl font-bold text-center tracking-tight text-gray-900 dark:text-white">Web Hydra</h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Next-Gen WAF Dashboard</p>
+      </div>
+
+      <!-- Login Form -->
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1"
+            for="username">Username</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+              <i data-feather="user" class="w-4 h-4"></i>
+            </span>
+            <input id="username" type="text"
+              class="w-full pl-10 pr-3 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors text-sm"
+              placeholder="Enter username">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1"
+            for="password">Password</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+              <i data-feather="lock" class="w-4 h-4"></i>
+            </span>
+            <input id="password" type="password"
+              class="w-full pl-10 pr-3 py-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors text-sm"
+              placeholder="Enter password">
+          </div>
+        </div>
+
+        <p id="login-error" class="text-sm text-red-500 text-center hidden flex items-center justify-center gap-1">
+          <i data-feather="alert-circle" class="w-4 h-4"></i>
+          <span>Invalid credentials</span>
+        </p>
+
+        <button id="login-btn"
+          class="w-full bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 text-white font-semibold py-2.5 px-4 rounded-lg shadow-lg shadow-teal-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+          Sign In
+        </button>
+      </div>
+
+      <div class="text-center text-xs text-gray-400 dark:text-gray-500 mt-6">
+        &copy; 2026 Web Hydra Security
+      </div>
+    </div>
+  </div>
+
+  <!-- MVC Architecture -->
+  <script src="services/StorageService.js"></script>
+  <script src="utils/constants.js"></script>
+  <script src="utils/helpers.js"></script>
+  <script src="models/UserModel.js"></script>
+  <script src="services/ApiService.js"></script>
+  <script src="models/AuthModel.js"></script>
+  <script src="controllers/AuthController.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initialize theme from storage
+      const storedTheme = StorageService.getTheme();
+      if (storedTheme === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+
+      // Theme toggle logic
+      const themeBtn = document.getElementById('theme-toggle');
+      if (themeBtn) {
+        const updateIcon = () => {
+          const isDark = document.documentElement.classList.contains('dark');
+          themeBtn.innerHTML = `<i data-feather="${isDark ? 'sun' : 'moon'}" class="w-5 h-5"></i>`;
+          feather.replace();
+        };
+        updateIcon();
+
+        themeBtn.addEventListener('click', () => {
+          document.documentElement.classList.toggle('dark');
+          const newTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+          StorageService.setTheme(newTheme);
+          updateIcon();
+        });
+      }
+
+      // Initialize Auth Controller
+      const authModel = new AuthModel();
+      const authController = new AuthController(authModel);
+      authController.init();
+
+      feather.replace();
+    });
+  </script>
+</body>
+
+</html>

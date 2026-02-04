@@ -1,0 +1,307 @@
+/* ===================================================================
+   HYDRA Dashboard - Custom Styles
+   =================================================================== */
+
+/* --- Base & Transitions --- */
+html {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(13, 148, 136, 0.6);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+/* --- Mobile Sidebar Overlay --- */
+@media (max-width: 640px) {
+  #sidebar {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    width: 100%;
+    height: 100%;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    /* Backdrop */
+    display: flex;
+    /* Override hidden */
+  }
+
+  #sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Actual sidebar content wrapper */
+  #sidebar>div {
+    width: 16rem;
+    /* w-64 */
+    height: 100%;
+    background-color: inherit;
+    /* Use bg-white/gray-800 from parent class */
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* --- Form Elements --- */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #0d9488;
+  box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.3);
+  transition: all 0.2s;
+}
+
+/* --- Heatmap Grid (7 days x 24 hours) --- */
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(24, 1fr);
+  gap: 2px;
+  min-height: 400px;
+}
+
+.heatmap-cell {
+  width: 100%;
+  aspect-ratio: 1;
+  position: relative;
+  min-height: 12px;
+}
+
+.heatmap-cell span {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: 2px;
+}
+
+/* --- Logo Glow Effect --- */
+.logo-glow {
+  filter: drop-shadow(0 0 12px rgba(13, 148, 136, 0.6));
+  transition: filter 0.3s;
+}
+
+.logo-glow:hover {
+  filter: drop-shadow(0 0 16px rgba(13, 148, 136, 0.8));
+}
+
+/* ===================================================================
+   Severity Badges
+   =================================================================== */
+.severity-badge {
+  display: inline-block;
+  font-weight: bold;
+  padding: 4px 10px;
+  border-radius: 50px;
+  text-align: center;
+  min-width: 80px;
+  text-transform: uppercase;
+  font-size: 0.70rem;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.severity-critical {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  color: #fff;
+  border: 1px solid #b91c1c;
+}
+
+.severity-high {
+  background: linear-gradient(135deg, #f97316, #c2410c);
+  color: #fff;
+  border: 1px solid #c2410c;
+}
+
+.severity-medium {
+  background: linear-gradient(135deg, #eab308, #a16207);
+  color: #fff;
+  border: 1px solid #a16207;
+}
+
+.severity-low {
+  background: linear-gradient(135deg, #22c55e, #15803d);
+  color: #fff;
+  border: 1px solid #15803d;
+}
+
+/* ===================================================================
+   Color Palette Overrides (Premium Gray Scale)
+   Override Tailwind defaults for consistent dark/light theming
+   =================================================================== */
+
+/* --- Light Mode Backgrounds --- */
+.bg-gray-50 {
+  background-color: #fafafa !important;
+}
+
+.bg-white {
+  background-color: #ffffff !important;
+}
+
+.bg-gray-100 {
+  background-color: #f4f4f5 !important;
+}
+
+.bg-gray-200 {
+  background-color: #e4e4e7 !important;
+}
+
+.bg-gray-300 {
+  background-color: #d4d4d8 !important;
+}
+
+/* --- Light Mode Text --- */
+.text-gray-800 {
+  color: #18181b !important;
+}
+
+.text-gray-700 {
+  color: #27272a !important;
+}
+
+.text-gray-600 {
+  color: #52525b !important;
+}
+
+.text-gray-500 {
+  color: #71717a !important;
+}
+
+/* --- Light Mode Borders --- */
+.border-gray-200,
+.border-gray-300,
+.divide-gray-200 {
+  border-color: #e4e4e7 !important;
+}
+
+/* --- Light Mode Hover --- */
+.hover\:bg-gray-100:hover {
+  background-color: #f4f4f5 !important;
+}
+
+/* --- Dark Mode Backgrounds --- */
+.dark .bg-gray-50,
+.dark .bg-gray-100 {
+  background-color: #09090b !important;
+}
+
+/* Extremely dark */
+.dark .bg-gray-200,
+.dark .bg-gray-300,
+.dark .bg-gray-700 {
+  background-color: #18181b !important;
+}
+
+/* Card bg */
+.dark .bg-gray-800,
+.dark .bg-white {
+  background-color: #18181b !important;
+}
+
+/* Main items */
+.dark .bg-gray-900 {
+  background-color: #09090b !important;
+}
+
+/* Body bg */
+
+/* --- Dark Mode Text --- */
+.dark .text-gray-100 {
+  color: #fafafa !important;
+}
+
+.dark .text-gray-200 {
+  color: #e4e4e7 !important;
+}
+
+.dark .text-gray-300 {
+  color: #d4d4d8 !important;
+}
+
+.dark .text-gray-400 {
+  color: #a1a1aa !important;
+}
+
+.dark .text-gray-800,
+.dark .text-gray-700 {
+  color: #fafafa !important;
+}
+
+.dark .text-gray-600,
+.dark .text-gray-500 {
+  color: #a1a1aa !important;
+}
+
+/* --- Dark Mode Borders --- */
+.dark .border-gray-200,
+.dark .border-gray-300,
+.dark .border-gray-600,
+.dark .border-gray-700,
+.dark .divide-gray-700 {
+  border-color: #27272a !important;
+}
+
+/* --- Dark Mode Hover --- */
+.dark .hover\:bg-gray-700:hover {
+  background-color: #27272a !important;
+}
+
+/* --- Accent Colors (Teal to Neutral) --- */
+/* We keep the Teal accent but make it pop against the premium gray */
+.text-teal-600 {
+  color: #0d9488 !important;
+}
+
+.dark .text-teal-600 {
+  color: #2dd4bf !important;
+}
+
+.hover\:text-teal-600:hover {
+  color: #0f766e !important;
+}
+
+.dark .hover\:text-teal-600:hover {
+  color: #5eead4 !important;
+}
+
+.bg-teal-600 {
+  background-color: #0d9488 !important;
+}
+
+.hover\:bg-teal-700:hover {
+  background-color: #0f766e !important;
+}
+
+.dark .bg-teal-600 {
+  background-color: #14b8a6 !important;
+}
+
+.dark .hover\:bg-teal-700:hover {
+  background-color: #0d9488 !important;
+}
+
+.peer-checked\:bg-teal-600 {
+  background-color: #0d9488 !important;
+}
+
+.peer-focus\:ring-teal-500 {
+  --tw-ring-color: #0d9488 !important;
+}
