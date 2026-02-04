@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Hydra – Threat Intelligence</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Feather Icons -->
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js"></script>
+  <!-- Chart.js (included for consistency, though unused on this page) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+
+<body data-page="intelligence" class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 antialiased">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside id="sidebar"
+      class="hidden sm:flex sm:flex-col sm:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+    </aside>
+
+    <!-- Main content area -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- Topbar -->
+      <header
+        class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+        <div class="flex items-center space-x-2">
+          <button id="mobile-menu-button" class="sm:hidden focus:outline-none text-gray-700 dark:text-gray-300"
+            aria-label="Toggle navigation"><i data-feather="menu"></i></button>
+          <h1 class="text-xl font-semibold">Threat Intelligence</h1>
+        </div>
+        <!-- Theme and logout controls -->
+        <div class="flex items-center space-x-2">
+          <button id="theme-toggle"
+            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300"
+            aria-label="Toggle theme"><i data-feather="sun"></i></button>
+          <button id="logout-btn"
+            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300"
+            aria-label="Logout"><i data-feather="log-out"></i></button>
+        </div>
+      </header>
+
+      <!-- Page content -->
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+        <!-- Intelligence feeds -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- VirusTotal Manual Lookup -->
+          <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow">
+            <h3 class="font-semibold mb-2">VirusTotal Quick Scan</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Check a file hash instantly.</p>
+            <div class="space-y-2">
+              <input type="text" id="vt-input" placeholder="Paste MD5/SHA256 Hash"
+                class="w-full bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded p-2 text-sm text-gray-900 dark:text-white">
+              <button id="vt-lookup-btn"
+                class="w-full bg-teal-600 hover:bg-teal-700 text-white rounded p-2 text-sm font-medium">Check
+                Hash</button>
+            </div>
+            <div id="vt-result" class="mt-4 hidden"></div>
+          </div>
+
+          <!-- AlienVault OTX feed -->
+          <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow">
+            <h3 class="font-semibold mb-2">AlienVault OTX Pulses (Latest)</h3>
+            <div id="otx-feed" class="space-y-2 min-h-[200px]">
+              <!-- Dynamic Content -->
+            </div>
+          </div>
+
+          <!-- AbuseIPDB feed -->
+          <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow">
+            <h3 class="font-semibold mb-2">AbuseIPDB Blacklist (Top 10)</h3>
+            <div id="abuseipdb-feed" class="space-y-2 min-h-[200px]">
+              <!-- Dynamic Content -->
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <!-- Include mock data and shared JS -->
+  <!-- Mock data -->
+  <script src="data/mock-data.js"></script>
+
+  <!-- MVC Architecture -->
+  <!-- Services -->
+  <script src="services/ApiService.js"></script>
+  <script src="services/StorageService.js"></script>
+  <!-- Utils -->
+  <script src="utils/constants.js"></script>
+  <script src="utils/helpers.js"></script>
+  <!-- Models -->
+  <!-- Models -->
+  <script src="models/DataModel.js?v=4"></script>
+  <script src="models/UserModel.js?v=4"></script>
+  <script src="models/AuthModel.js?v=4"></script>
+  <!-- Controllers -->
+  <script src="controllers/IntelController.js?v=4"></script>
+  <!-- Main App -->
+  <script defer src="assets/app-mvc.js?v=4"></script>
+</body>
+
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Hydra – Rules &amp; Policies</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Feather Icons -->
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="rules" class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 antialiased">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="hidden sm:flex sm:flex-col sm:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"></aside>
+    <!-- Main content area -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- Topbar -->
+      <header class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+        <div class="flex items-center space-x-2">
+          <button id="mobile-menu-button" class="sm:hidden focus:outline-none text-gray-700 dark:text-gray-300" aria-label="Toggle navigation"><i data-feather="menu"></i></button>
+          <h1 class="text-xl font-semibold">Rules &amp; Policies</h1>
+        </div>
+        <!-- Theme and logout controls -->
+        <div class="flex items-center space-x-2">
+          <button id="theme-toggle" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300" aria-label="Toggle theme"><i data-feather="sun"></i></button>
+          <button id="logout-btn" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300" aria-label="Logout"><i data-feather="log-out"></i></button>
+        </div>
+      </header>
+      <!-- Page content -->
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold">Rules &amp; Policies</h3>
+          <button id="open-add-rule" class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded">Add Rule</button>
+        </div>
+        <div class="overflow-x-auto bg-white dark:bg-gray-800 rounded-2xl shadow p-4">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+            <thead><tr>
+              <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">ID</th>
+              <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">Name</th>
+              <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">Description</th>
+              <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">Enabled</th>
+              <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">Actions</th>
+            </tr></thead>
+            <tbody id="rules-table" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+  <!-- Rule modal for add/edit -->
+  <div id="rule-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50" aria-hidden="true">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-lg mx-4 p-6 shadow-lg">
+      <h3 id="rule-modal-title" class="text-lg font-semibold mb-4">Add Rule</h3>
+      <form id="rule-form" class="space-y-4">
+        <div>
+          <label for="rule-name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
+          <input id="rule-name" type="text" required class="mt-1 w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:outline-none">
+        </div>
+        <div>
+          <label for="rule-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+          <textarea id="rule-description" required rows="3" class="mt-1 w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:outline-none"></textarea>
+        </div>
+        <div class="flex items-center justify-end space-x-2">
+          <button type="button" id="close-rule-modal" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- Mock data -->
+  <script src="data/mock-data.js"></script>
+  
+  <!-- MVC Architecture -->
+  <!-- Services -->
+  <script src="services/ApiService.js"></script>
+  <script src="services/StorageService.js"></script>
+  <!-- Utils -->
+  <script src="utils/constants.js"></script>
+  <script src="utils/helpers.js"></script>
+  <!-- Models -->
+  <script src="models/DataModel.js"></script>
+  <script src="models/UserModel.js"></script>
+  <script src="models/AuthModel.js"></script>
+  <!-- Views -->
+  <script src="views/RulesView.js"></script>
+  <!-- Controllers -->
+  <script src="controllers/RulesController.js"></script>
+  <!-- Main App -->
+  <script defer src="assets/app-mvc.js"></script>
+</body>
+</html>

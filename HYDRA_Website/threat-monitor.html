@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Hydra – Threat Monitor</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Feather Icons -->
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js"></script>
+  <!-- Chart.js (not used directly but included for consistency) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+
+<body data-page="threat" class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 antialiased">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside id="sidebar"
+      class="hidden sm:flex sm:flex-col sm:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+    </aside>
+    <!-- Main content area -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- Topbar -->
+      <header
+        class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+        <div class="flex items-center space-x-2">
+          <button id="mobile-menu-button" class="sm:hidden focus:outline-none text-gray-700 dark:text-gray-300"
+            aria-label="Toggle navigation"><i data-feather="menu"></i></button>
+          <h1 class="text-xl font-semibold">Threat Monitor</h1>
+        </div>
+        <!-- Theme and logout controls -->
+        <div class="flex items-center space-x-2">
+          <button id="theme-toggle"
+            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300"
+            aria-label="Toggle theme"><i data-feather="sun"></i></button>
+          <button id="logout-btn"
+            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300"
+            aria-label="Logout"><i data-feather="log-out"></i></button>
+        </div>
+      </header>
+      <!-- Page content -->
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+        <!-- TI Lookup Section -->
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow mb-6">
+          <h3 class="mb-4 font-semibold text-lg flex items-center">
+            <i data-feather="search" class="w-5 h-5 mr-2"></i> Threat Intelligence Lookup
+          </h3>
+          <div class="flex flex-col sm:flex-row gap-4 mb-4">
+            <select id="ti-type"
+              class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-teal-500 focus:border-teal-500 block p-2.5">
+              <option value="ip">IP Address</option>
+              <option value="domain">Domain</option>
+              <option value="hash">File Hash</option>
+            </select>
+            <input type="text" id="ti-input"
+              class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5"
+              placeholder="Enter IP, Domain or Hash..." required>
+            <button id="ti-search-btn"
+              class="text-white bg-teal-600 hover:bg-teal-700 focus:ring-4 focus:ring-teal-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+              Scan
+            </button>
+          </div>
+
+          <!-- Results Container -->
+          <div id="ti-results" class="grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
+            <!-- Results will be injected here -->
+          </div>
+          <div id="ti-loading" class="hidden text-center py-4 text-gray-500">
+            <i data-feather="loader" class="animate-spin h-6 w-6 mx-auto mb-2"></i>
+            Scanning Threat Feeds...
+          </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-4">
+          <!-- Heatmap -->
+          <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow">
+            <h3 class="mb-2 font-semibold">Anomaly Heatmap (Last 7 Days)</h3>
+            <div class="heatmap-grid" id="heatmap-grid"></div>
+            <div class="mt-2 flex justify-between text-xs text-gray-500 dark:text-gray-400">
+              <span>Low</span><span>Medium</span><span>High</span></div>
+          </div>
+          <!-- Live anomalies -->
+          <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl shadow flex flex-col">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-semibold">Live Anomalies</h3>
+              <button id="toggle-live-anomalies"
+                class="text-sm bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 rounded focus:outline-none">Pause</button>
+            </div>
+            <div id="live-anomalies-list"
+              class="flex-1 overflow-y-auto space-y-2 text-sm pr-2 min-h-[300px] max-h-[500px]"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <!-- Mock data -->
+  <script src="data/mock-data.js"></script>
+
+  <!-- MVC Architecture -->
+  <!-- Services -->
+  <script src="services/ApiService.js"></script>
+  <script src="services/StorageService.js"></script>
+  <!-- Utils -->
+  <script src="utils/constants.js"></script>
+  <script src="utils/helpers.js"></script>
+  <!-- Models -->
+  <script src="models/DataModel.js"></script>
+  <script src="models/UserModel.js"></script>
+  <script src="models/AuthModel.js"></script>
+  <!-- Views -->
+  <script src="views/ThreatView.js"></script>
+  <!-- Controllers -->
+  <script src="controllers/ThreatController.js"></script>
+  <!-- Main App -->
+  <script defer src="assets/app-mvc.js"></script>
+</body>
+
+</html>

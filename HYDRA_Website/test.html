@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Hydra – WAF Test Suite</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Feather Icons -->
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js"></script>
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="test" class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 antialiased">
+  <div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="hidden sm:flex sm:flex-col sm:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"></aside>
+    
+    <!-- Main content area -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <!-- Topbar -->
+      <header class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+        <div class="flex items-center space-x-2">
+          <button id="mobile-menu-button" class="sm:hidden focus:outline-none text-gray-700 dark:text-gray-300" aria-label="Toggle navigation"><i data-feather="menu"></i></button>
+          <h1 class="text-xl font-semibold">WAF Test Suite - JuiceShop Edition</h1>
+        </div>
+        <!-- Theme and logout controls -->
+        <div class="flex items-center space-x-2">
+          <button id="theme-toggle" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300" aria-label="Toggle theme"><i data-feather="sun"></i></button>
+          <button id="logout-btn" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300" aria-label="Logout"><i data-feather="log-out"></i></button>
+        </div>
+      </header>
+      
+      <!-- Page content -->
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+        <!-- Header Section -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border-l-4 border-teal-500">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-2xl font-bold mb-2">WAF Attack Simulation Suite</h2>
+              <p class="text-gray-600 dark:text-gray-400">
+                Real attack payloads from <span class="font-semibold text-teal-500">PayloadsAllTheThings</span> targeting OWASP JuiceShop endpoints.
+              </p>
+            </div>
+            <div class="text-right">
+              <div class="text-3xl font-bold text-teal-500" id="score-display">0/0</div>
+              <div class="text-sm text-gray-500">Detection Score</div>
+            </div>
+          </div>
+          
+          <!-- Control Buttons -->
+          <div class="flex flex-wrap gap-3 mb-6">
+            <button id="test-all" class="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 shadow-md transition-all hover:shadow-lg">
+              <i data-feather="play-circle" class="w-5 h-5"></i>
+              <span>Run All 20 Tests</span>
+            </button>
+            <button id="traffic-sim" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 shadow-md transition-all hover:shadow-lg">
+              <i data-feather="activity" class="w-5 h-5"></i>
+              <span id="traffic-sim-text">Start Traffic Simulator</span>
+            </button>
+            <button id="clear-results" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 shadow-md transition-all hover:shadow-lg">
+              <i data-feather="x-circle" class="w-5 h-5"></i>
+              <span>Clear Results</span>
+            </button>
+          </div>
+          
+          <!-- Traffic Simulator Status -->
+          <div id="traffic-status" class="hidden mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="animate-pulse w-3 h-3 bg-blue-600 rounded-full"></div>
+                <div>
+                  <p class="font-semibold text-blue-900 dark:text-blue-100">Traffic Simulator Active</p>
+                  <p class="text-sm text-blue-700 dark:text-blue-300">
+                    <span id="traffic-count">0</span> requests sent | 
+                    <span id="traffic-blocked">0</span> blocked | 
+                    <span id="traffic-allowed">0</span> allowed
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attack Categories Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          
+          <!-- SQL Injection -->
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 border-l-4 border-red-500">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                <i data-feather="database" class="w-5 h-5 text-red-600"></i>
+              </div>
+              <div>
+                <h3 class="font-bold">SQL Injection</h3>
+                <p class="text-xs text-gray-500">Auth Bypass, UNION, Time-based</p>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <button id="test-1" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-red-100 dark:hover:bg-red-900/30 transition text-sm">
+                <span class="font-medium">SQLi - Auth Bypass</span>
+                <code class="block text-xs text-gray-500 truncate">admin' or '1'='1</code>
+              </button>
+              <button id="test-2" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-red-100 dark:hover:bg-red-900/30 transition text-sm">
+                <span class="font-medium">SQLi - UNION SELECT</span>
+                <code class="block text-xs text-gray-500 truncate">' UNION SELECT username,password--</code>
+              </button>
+              <button id="test-3" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-red-100 dark:hover:bg-red-900/30 transition text-sm">
+                <span class="font-medium">SQLi - Time-based</span>
+                <code class="block text-xs text-gray-500 truncate">' AND SLEEP(5)--</code>
+              </button>
+            </div>
+          </div>
+
+          <!-- XSS -->
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 border-l-4 border-orange-500">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
+                <i data-feather="code" class="w-5 h-5 text-orange-600"></i>
+              </div>
+              <div>
+                <h3 class="font-bold">Cross-Site Scripting</h3>
+                <p class="text-xs text-gray-500">Script, Event Handlers, Polyglot</p>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <button id="test-4" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition text-sm">
+                <span class="font-medium">XSS - Script Tag</span>
+                <code class="block text-xs text-gray-500 truncate">&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code>
+              </button>
+              <button id="test-5" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition text-sm">
+                <span class="font-medium">XSS - Event Handler</span>
+                <code class="block text-xs text-gray-500 truncate">&lt;svg onload=alert(1)&gt;</code>
+              </button>
+              <button id="test-6" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition text-sm">
+                <span class="font-medium">XSS - Polyglot</span>
+                <code class="block text-xs text-gray-500 truncate">'"--&gt;</script>&lt;svg onload=alert()&gt;</code>
+              </button>
+            </div>
+          </div>
+
+          <!-- Command Injection -->
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 border-l-4 border-purple-500">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                <i data-feather="terminal" class="w-5 h-5 text-purple-600"></i>
+              </div>
+              <div>
+                <h3 class="font-bold">Command Injection</h3>
+                <p class="text-xs text-gray-500">Shell commands, Backticks</p>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <button id="test-7" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-purple-100 dark:hover:bg-purple-900/30 transition text-sm">
+                <span class="font-medium">CMDi - cat /etc/passwd</span>
+                <code class="block text-xs text-gray-500 truncate">; cat /etc/passwd</code>
+              </button>
+              <button id="test-8" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-purple-100 dark:hover:bg-purple-900/30 transition text-sm">
+                <span class="font-medium">CMDi - Backtick</span>
+                <code class="block text-xs text-gray-500 truncate">`whoami`</code>
+              </button>
+            </div>
+          </div>
+
+          <!-- Path Traversal -->
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 border-l-4 border-yellow-500">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-lg bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
+                <i data-feather="folder" class="w-5 h-5 text-yellow-600"></i>
+              </div>
+              <div>
+                <h3 class="font-bold">Path Traversal</h3>
+                <p class="text-xs text-gray-500">Directory traversal, Encoded</p>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <button id="test-9" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition text-sm">
+                <span class="font-medium">Path Traversal - Basic</span>
+                <code class="block text-xs text-gray-500 truncate">../../../etc/passwd</code>
+              </button>
+              <button id="test-10" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition text-sm">
+                <span class="font-medium">Path Traversal - Encoded</span>
+                <code class="block text-xs text-gray-500 truncate">..%2F..%2F..%2Fetc%2Fpasswd</code>
+              </button>
+            </div>
+          </div>
+
+          <!-- SSRF -->
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 border-l-4 border-pink-500">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-lg bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
+                <i data-feather="globe" class="w-5 h-5 text-pink-600"></i>
+              </div>
+              <div>
+                <h3 class="font-bold">SSRF</h3>
+                <p class="text-xs text-gray-500">AWS Metadata, File Protocol</p>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <button id="test-11" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-pink-100 dark:hover:bg-pink-900/30 transition text-sm">
+                <span class="font-medium">SSRF - AWS Metadata</span>
+                <code class="block text-xs text-gray-500 truncate">http://169.254.169.254/meta-data/</code>
+              </button>
+              <button id="test-12" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-pink-100 dark:hover:bg-pink-900/30 transition text-sm">
+                <span class="font-medium">SSRF - File Protocol</span>
+                <code class="block text-xs text-gray-500 truncate">file:///etc/passwd</code>
+              </button>
+            </div>
+          </div>
+
+          <!-- NoSQL Injection -->
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 border-l-4 border-cyan-500">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
+                <i data-feather="layers" class="w-5 h-5 text-cyan-600"></i>
+              </div>
+              <div>
+                <h3 class="font-bold">NoSQL Injection</h3>
+                <p class="text-xs text-gray-500">MongoDB operators</p>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <button id="test-13" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition text-sm">
+                <span class="font-medium">NoSQLi - $gt Operator</span>
+                <code class="block text-xs text-gray-500 truncate">{"$gt": ""}</code>
+              </button>
+              <button id="test-14" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-cyan-100 dark:hover:bg-cyan-900/30 transition text-sm">
+                <span class="font-medium">NoSQLi - $regex</span>
+                <code class="block text-xs text-gray-500 truncate">{"$regex": "^admin"}</code>
+              </button>
+            </div>
+          </div>
+
+          <!-- Open Redirect -->
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 border-l-4 border-indigo-500">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+                <i data-feather="external-link" class="w-5 h-5 text-indigo-600"></i>
+              </div>
+              <div>
+                <h3 class="font-bold">Open Redirect</h3>
+                <p class="text-xs text-gray-500">URL redirection</p>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <button id="test-15" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition text-sm">
+                <span class="font-medium">Open Redirect - Protocol</span>
+                <code class="block text-xs text-gray-500 truncate">//evil.com</code>
+              </button>
+            </div>
+          </div>
+
+          <!-- ML Detection -->
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 border-l-4 border-violet-500">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center">
+                <i data-feather="cpu" class="w-5 h-5 text-violet-600"></i>
+              </div>
+              <div>
+                <h3 class="font-bold">ML Detection</h3>
+                <p class="text-xs text-gray-500">Anomaly-based detection</p>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <button id="test-16" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-violet-100 dark:hover:bg-violet-900/30 transition text-sm">
+                <span class="font-medium">ML - High Entropy</span>
+                <code class="block text-xs text-gray-500 truncate">[Random 500 chars]</code>
+              </button>
+              <button id="test-17" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-violet-100 dark:hover:bg-violet-900/30 transition text-sm">
+                <span class="font-medium">ML - Keyword Flood</span>
+                <code class="block text-xs text-gray-500 truncate">union select (x100)</code>
+              </button>
+            </div>
+          </div>
+
+          <!-- Legitimate Requests -->
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 border-l-4 border-green-500">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                <i data-feather="check-circle" class="w-5 h-5 text-green-600"></i>
+              </div>
+              <div>
+                <h3 class="font-bold">Legitimate (FP Check)</h3>
+                <p class="text-xs text-gray-500">Should NOT be blocked</p>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <button id="test-18" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-green-100 dark:hover:bg-green-900/30 transition text-sm">
+                <span class="font-medium">Safe - Product Search</span>
+                <code class="block text-xs text-gray-500 truncate">apple juice</code>
+              </button>
+              <button id="test-19" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-green-100 dark:hover:bg-green-900/30 transition text-sm">
+                <span class="font-medium">Safe - Login</span>
+                <code class="block text-xs text-gray-500 truncate">user@juice-sh.op</code>
+              </button>
+              <button id="test-20" class="w-full text-left px-3 py-2 rounded bg-gray-100 dark:bg-gray-700 hover:bg-green-100 dark:hover:bg-green-900/30 transition text-sm">
+                <span class="font-medium">Safe - Feedback</span>
+                <code class="block text-xs text-gray-500 truncate">Great product selection...</code>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold">Test Results</h3>
+            <span id="test-summary" class="text-sm text-gray-500 dark:text-gray-400"></span>
+          </div>
+          <div id="test-results" class="space-y-4">
+            <div class="text-center py-12 text-gray-500 dark:text-gray-400">
+              <i data-feather="shield" class="w-16 h-16 mx-auto mb-4 opacity-50"></i>
+              <p class="text-lg">Ready to test WAF protection</p>
+              <p class="text-sm mt-2">Click "Run All 20 Tests" or select individual attacks above</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  
+  <!-- Include mock data and shared JS -->
+  <script src="data/mock-data.js"></script>
+  
+  <!-- MVC Architecture -->
+  <!-- Services -->
+  <script src="services/ApiService.js"></script>
+  <script src="services/StorageService.js"></script>
+  <!-- Utils -->
+  <script src="utils/constants.js"></script>
+  <script src="utils/helpers.js"></script>
+  <!-- Models -->
+  <script src="models/DataModel.js"></script>
+  <script src="models/UserModel.js"></script>
+  <script src="models/AuthModel.js"></script>
+  <!-- Main App -->
+  <script defer src="assets/app-mvc.js"></script>
+  <!-- Test page specific -->
+  <script src="assets/test.js"></script>
+</body>
+</html>
