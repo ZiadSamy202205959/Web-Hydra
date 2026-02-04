@@ -1,0 +1,110 @@
+- id: SQL_UNION_SELECT
+  regex: "union(?:\\s+all)?\\s+select"
+
+- id: SQL_COMMENT_OR_1_1
+  regex: "(?:')\\s*or\\s*1=1(?:--|#|\\/\\*)?"
+
+- id: SQL_STACKED_QUERIES
+  regex: ";\\s*(select|insert|delete|update|drop)\\b"
+
+- id: SQL_HEX_OBFUSCATION
+  regex: "0x[0-9a-fA-F]{2,}"
+
+- id: SQL_SLEEP_TIMEBASED
+  regex: "\\bsleep\\s*\\(\\s*\\d+\\s*\\)"
+
+- id: SQL_INFORMATION_SCHEMA
+  regex: "information_schema|pg_catalog"
+
+- id: XSS_SCRIPT_TAG
+  regex: "<script.*?>.*?</script>"
+
+- id: XSS_IMG_ONERROR
+  regex: "<img\\s+[^>]*onerror\\s*=\\s*['\"]?"
+
+- id: XSS_JAVASCRIPT_URL
+  regex: "javascript:\\s*[^\\s]+"
+
+- id: XSS_EVENT_HANDLER
+  regex: "on(?:load|error|mouseover|focus|click)=['\"]?"
+
+- id: CMD_INJECTION_BASIC
+  regex: "(?:\\bcat\\b|\\bwget\\b|\\bcurl\\b|\\bping\\b|\\bwhoami\\b)"
+
+- id: CMD_SEMICOLON_CHAINING
+  regex: ";\\s*(ls|id|uname|bash|sh|powershell)\\b"
+
+- id: TRAVERSAL_DOTDOT
+  regex: "(?:\\.\\./)+"
+
+- id: LFI_ETC_PASSWD
+  regex: "/etc/passwd"
+
+- id: RFI_HTTP_INCLUDE
+  regex: "https?://[^\\s]+\\.(php|txt|cfg|inc)"
+
+- id: SSRF_AWS_METADATA
+  regex: "169\\.254\\.169\\.254|metadata\\.aws\\.amazonaws\\.com"
+
+- id: OPEN_REDIRECT
+  regex: "(?:\\?|&)redirect=\\s*https?://"
+
+- id: XML_EXTERNAL_ENTITY
+  regex: "<!ENTITY\\s+\\w+\\s+SYSTEM\\s+['\"]?(file|http)"
+
+- id: SQL_INJECTION_LIST
+  regex: "ORDER\\ BY\\ SLEEP\\(5\\)|ORDER\\ BY\\ 1,SLEEP\\(5\\)|ORDER\\ BY\\ 1,SLEEP\\(5\\),BENCHMARK\\(1000000,MD5\\('A'\\)\\)|ORDER\\ BY\\ 1,SLEEP\\(5\\),BENCHMARK\\(1000000,MD5\\('A'\\)\\),4|ORDER\\ BY\\ 1,SLEEP\\(5\\),BENCHMARK\\(1000000,MD5\\('A'\\)\\),4,5|ORDER\\ BY\\ 1,SLEEP\\(5\\),BENCHMARK\\(1000000,MD5\\('A'\\)\\),4,5,6|ORDER\\ BY\\ 1,SLEEP\\(5\\),BENCHMARK\\(1000000,MD5\\('A'\\)\\),4,5,6,7|ORDER\\ BY\\ 1,SLEEP\\(5\\),BENCHMARK\\(1000000,MD5\\('A'\\)\\),4,5,6,7,8|ORDER\\ BY\\ 1,SLEEP\\(5\\),BENCHMARK\\(1000000,MD5\\('A'\\)\\),4,5,6,7,8,9|ORDER\\ BY\\ 1,SLEEP\\(5\\),BENCHMARK\\(1000000,MD5\\('A'\\)\\),4,5,6,7,8,9,10"
+
+- id: NOSQL_INJECTION_LIST
+  regex: "true,\\ \\$where:\\ '1\\ ==\\ 1'|,\\ \\$where:\\ '1\\ ==\\ 1'|\\$where:\\ '1\\ ==\\ 1'|',\\ \\$where:\\ '1\\ ==\\ 1'|1,\\ \\$where:\\ '1\\ ==\\ 1'|\\{\\ \\$ne:\\ 1\\ \\}|',\\ \\$or:\\ \\[\\ \\{\\},\\ \\{\\ 'a':'a|'\\ \\}\\ \\],\\ \\$comment:'successful\\ MongoDB\\ injection'|db\\.injection\\.insert\\(\\{success:1\\}\\);|db\\.injection\\.insert\\(\\{success:1\\}\\);return\\ 1;db\\.stores\\.mapReduce\\(function\\(\\)\\ \\{\\ \\{\\ emit\\(1,1"
+
+- id: XSS_LIST
+  regex: "javascript:alert\\(1\\)//INJECTX|<svg/onload=alert\\(1\\)>//INJECTX|<img\\ onload=alert\\(1\\)>//INJECTX|<img\\ src=x\\ onerror=prompt\\(1\\)>//INJECTX|<a\\ href=\"javascript:alert\\(1\\)\"\\ onmouseover=alert\\(1\\)>INJECTX\\ HOVER</a>|onmouseover=\"document\\.cookie=true;\">//INJECTX|alert\\(1\\)>//INJECTX|<h1>INJECTX</h1>|<img\\ src=x\\ onload=prompt\\(1\\)\\ onerror=alert\\(1\\)\\ onmouseover=prompt\\(1\\)>|<svg><script>/<@/>alert\\(1\\)</script>//INJECTX"
+
+- id: COMMAND_INJECTION_LIST
+  regex: "%0a|%0a%0d|%0Acat%20/etc/passwd|%0Aid|%0a\\ id\\ %0a|%0Aid%0A|%0a\\ ping\\ \\-i\\ 30\\ 127\\.0\\.0\\.1\\ %0a|%0A/usr/bin/id|%0A/usr/bin/id%0A|%2\\ \\-n\\ 21\\ 127\\.0\\.0\\.1\\|\\|`ping\\ \\-c\\ 21\\ 127\\.0\\.0\\.1`\\ #'\\ \\|ping\\ \\-n\\ 21\\ 127\\.0\\.0\\.1\\|\\|`ping\\ \\-c\\ 21\\ 127\\.0\\.0\\.1`\\ #\\\\\"\\ \\|ping\\ \\-n\\ 21\\ 127\\.0\\.0\\.1"
+
+- id: XXE_LIST
+  regex: "<\\?xml\\ version=\"1\\.0\"\\ encoding=\"ISO\\-8859\\-1\"\\?><!DOCTYPE\\ foo\\ \\[\\ <!ELEMENT\\ foo\\ ANY><!ENTITY\\ xxe\\ SYSTEM\\ \"file:///etc/passwd\">\\ \\]>|<!DOCTYPE\\ foo\\ \\[<!ENTITY\\ xxe7eb97\\ SYSTEM\\ \"file:///etc/passwd\">\\ \\]>|<!DOCTYPE\\ foo\\ \\[<!ENTITY\\ xxe7eb97\\ SYSTEM\\ \"file:///c:/boot\\.ini\">\\ \\]>|<!DOCTYPE\\ foo\\ \\[<!ENTITY\\ xxe46471\\ SYSTEM\\ \"http://crowdshield\\.com/\\.testing/rfi_vuln\\.txt\">\\ \\]>|<\\?xml\\ version=\"1\\.0\"\\?><methodCall><methodName>demo\\.sayHello</methodName><params></params></methodCall>|<\\?xml\\ version=\"1\\.0\"\\?><change\\-log><text>Hello\\ World</text></change\\-log>|<\\?xml\\ version=\"1\\.0\"\\?><change\\-log><text>\\&quot;Hello\\ World\\&quot;</text></change\\-log>|<\\?xml\\ version=\"1\\.0\"\\?><!DOCTYPE\\ change\\-log\\[\\ <!ENTITY\\ myEntity\\ \"World\">\\ \\]><change\\-log><text>Hello\\ \\&myEntity;</text></change\\-log>|<\\?xml\\ version=\"1\\.0\"\\?><!DOCTYPE\\ change\\-log\\[\\ <!ENTITY\\ myEntity\\ \"World\"><!ENTITY\\ myQuote\\ \"\\&quot;\">\\ \\]><change\\-log><text>\\&myQuote;Hello\\ \\&myEntity;\\&myQuote;</text></change\\-log>|<!ENTITY\\ systemEntity\\ SYSTEM\\ \"robots\\.txt\">"
+
+- id: SSTI_LIST
+  regex: "\\{\\{4\\*4\\}\\}\\[\\[5\\*5\\]\\]|\\{\\{7\\*7\\}\\}|\\{\\{7\\*'7'\\}\\}|<%=\\ 7\\ \\*\\ 7\\ %>|\\$\\{3\\*3\\}|\\$\\{\\{7\\*7\\}\\}|@\\(1\\+2\\)|\\{\\{dump\\(app\\)\\}\\}|\\{\\{app\\.request\\.server\\.all\\|join\\(','\\)\\}\\}|\\{\\{config\\.items\\(\\)\\}\\}"
+
+- id: DIRECTORY_TRAVERSAL_LIST
+  regex: "\\\\\\.\\.\\\\WINDOWS\\\\win\\.ini|\\\\\\.\\.\\\\\\.\\.\\\\WINDOWS\\\\win\\.ini|\\\\\\.\\.\\\\\\.\\.\\\\\\.\\.\\\\WINDOWS\\\\win\\.ini|\\\\\\.\\.\\\\\\.\\.\\\\\\.\\.\\\\\\.\\.\\\\WINDOWS\\\\win\\.ini|\\\\\\.\\.\\\\\\.\\.\\\\\\.\\.\\\\\\.\\.\\\\\\.\\.\\\\WINDOWS\\\\win\\.ini|\\\\\\.\\.\\\\\\.\\.\\\\\\.\\.\\\\\\.\\.\\\\\\.\\.\\\\\\.\\.\\\\WINDOWS\\\\win\\.ini|%5c%2e%2e%5c%2e%2e%5c%2e%2e%5c%2e%2e%5c%2e%2e%5c%2e%2e%5c%57%49%4e%44%4f%57%53%5c%77%69%6e%2e%69%6e%69|%5c%2e%2e%5c%2e%2e%5c%2e%2e%5c%2e%2e%5c%2e%2e%5c%57%49%4e%44%4f%57%53%5c%77%69%6e%2e%69%6e%69|%5c%2e%2e%5c%2e%2e%5c%2e%2e%5c%2e%2e%5c%57%49%4e%44%4f%57%53%5c%77%69%6e%2e%69%6e%69|%5c%2e%2e%5c%2e%2e%5c%2e%2e%5c%57%49%4e%44%4f%57%53%5c%77%69%6e%2e%69%6e%69"
+
+- id: LFI_LIST
+  regex: "etc/passwd|etc/passwd%00|etc%2fpasswd|etc%2fpasswd%00|etc%5cpasswd|etc%5cpasswd%00|etc%c0%afpasswd|etc%c0%afpasswd%00|C:\\\\boot\\.ini|C:\\\\WINDOWS\\\\win\\.ini"
+
+- id: OPEN_REDIRECT_LIST
+  regex: "//google\\.com/%2f\\.\\.|//www\\.whitelisteddomain\\.tld@google\\.com/%2f\\.\\.|///google\\.com/%2f\\.\\.|///www\\.whitelisteddomain\\.tld@google\\.com/%2f\\.\\.|////google\\.com/%2f\\.\\.|////www\\.whitelisteddomain\\.tld@google\\.com/%2f\\.\\.|https://google\\.com/%2f\\.\\.|https://www\\.whitelisteddomain\\.tld@google\\.com/%2f\\.\\.|/https://google\\.com/%2f\\.\\.|/https://www\\.whitelisteddomain\\.tld@google\\.com/%2f\\.\\."
+
+- id: CRLF_INJECTION_LIST
+  regex: "/%%0a0aSet\\-Cookie:crlf=injection|/%0aSet\\-Cookie:crlf=injection|/%0d%0aSet\\-Cookie:crlf=injection|/%0dSet\\-Cookie:crlf=injection|/%23%0aSet\\-Cookie:crlf=injection|/%23%0d%0aSet\\-Cookie:crlf=injection|/%23%0dSet\\-Cookie:crlf=injection|/%25%30%61Set\\-Cookie:crlf=injection|/%25%30aSet\\-Cookie:crlf=injection|/%250aSet\\-Cookie:crlf=injection"
+
+- id: LDAP_INJECTION_LIST
+  regex: "\\*\\)\\(\\&|\\*\\)\\)%00|\\*\\(\\)\\|%26'|\\*\\(\\)\\|\\&'|\\*\\(\\|\\(mail=\\*\\)\\)|\\*\\(\\|\\(objectclass=\\*\\)\\)|\\*\\)\\(uid=\\*\\)\\)\\(\\|\\(uid=\\*|\\*/\\*|//\\*|admin\\*"
+
+- id: SSI_INJECTION_LIST
+  regex: "<!\\-\\-\\#config\\ errmsg=\"File\\ not\\ found,\\ informs\\ users\\ and\\ password\"\\-\\->|<!\\-\\-\\#config\\ timefmt=\"A\\ %B\\ %d\\ %Y\\ %r\"\\-\\->|<!\\-\\-\\#echo\\ var=\"DATE_LOCAL\"\\ \\-\\->|<!\\-\\-\\#echo\\ var=\"DOCUMENT_NAME\"\\ \\-\\->|<!\\-\\-\\#echo\\ var=\"DOCUMENT_URI\"\\ \\-\\->|<!\\-\\-\\#echo\\ var=\"auth_type\"\\ \\-\\->|<!\\-\\-\\#echo\\ var=\"content_length\"\\ \\-\\->|<!\\-\\-\\#echo\\ var=\"content_type\"\\ \\-\\->|<!\\-\\-\\#echo\\ var=\"date_gmt\"\\ \\-\\->|<!\\-\\-\\#echo\\ var=\"date_local\"\\ \\-\\->"
+
+- id: BUFFER_OVERFLOW
+  regex: "A{100,}"
+
+- id: FORMAT_STRING
+  regex: "%s%s%s|%x%x%x|%n%n%n"
+
+- id: HTTP_PARAMETER_POLLUTION
+  regex: "(?:\\?|&)(\\w+)=.*(?:\\?|&)\\1="
+
+- id: XPATH_INJECTION
+  regex: "' or '1'='1|' or 1=1|//user"
+
+- id: SSRF_BASIC
+  regex: "127\\.0\\.0\\.1|localhost|169\\.254\\.169\\.254|metadata\\.google\\.internal"
+
+- id: UPLOAD_INSECURE_EXT
+  regex: "\\.php$|\\.php[3-7]$|\\.phtml$|\\.pl$|\\.py$|\\.jsp$|\\.asp$|\\.aspx$|\\.exe$|\\.sh$"
+
+- id: RFI_PARAMETERS
+  regex: "=(http|ftp|https)://"
