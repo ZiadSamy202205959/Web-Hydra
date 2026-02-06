@@ -568,7 +568,7 @@ async def waf_entry(req: Request, path: str):
         with open(LOG_PATH, "a") as f:
             f.write(json.dumps(log_entry) + "\n")
         try:
-            httpx.post("https://your-server.com/api/logs", json=log_entry, timeout=2)
+            httpx.post("http://127.0.0.1:5000/api/ingest_log", json={**log_entry, "severity": "Critical" if score >= 0.85 else "High" if score >= 0.7 else "Medium", "detection_source": "ML"}, timeout=2)
         except:
             pass
         return JSONResponse(status_code=403, content={"detail": "Blocked and reported", "score": score})
@@ -579,7 +579,7 @@ async def waf_entry(req: Request, path: str):
         with open(LOG_PATH, "a") as f:
             f.write(json.dumps(log_entry) + "\n")
         try:
-            httpx.post("https://your-server.com/api/logs", json=log_entry, timeout=2)
+            httpx.post("http://127.0.0.1:5000/api/ingest_log", json={**log_entry, "severity": "Critical" if score >= 0.85 else "High" if score >= 0.7 else "Medium", "detection_source": "ML"}, timeout=2)
         except:
             pass
         return JSONResponse(status_code=403, content={"detail": "Blocked by ML", "score": score})
@@ -590,7 +590,7 @@ async def waf_entry(req: Request, path: str):
         with open(LOG_PATH, "a") as f:
             f.write(json.dumps(log_entry) + "\n")
         try:
-            httpx.post("https://your-server.com/api/logs", json=log_entry, timeout=2)
+            httpx.post("http://127.0.0.1:5000/api/ingest_log", json={**log_entry, "severity": "Critical" if score >= 0.85 else "High" if score >= 0.7 else "Medium", "detection_source": "ML"}, timeout=2)
         except:
             pass
         return await forward_upstream(req)

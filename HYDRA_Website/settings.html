@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,43 +14,57 @@
   <!-- Shared CSS -->
   <link rel="stylesheet" href="assets/style.css">
 </head>
+
 <body data-page="settings" class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 antialiased">
   <div class="flex h-screen">
     <!-- Sidebar -->
-    <aside id="sidebar" class="hidden sm:flex sm:flex-col sm:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"></aside>
+    <aside id="sidebar"
+      class="hidden sm:flex sm:flex-col sm:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+    </aside>
     <!-- Main content area -->
     <div class="flex-1 flex flex-col overflow-hidden">
       <!-- Topbar -->
-      <header class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+      <header
+        class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
         <div class="flex items-center space-x-2">
-          <button id="mobile-menu-button" class="sm:hidden focus:outline-none text-gray-700 dark:text-gray-300" aria-label="Toggle navigation"><i data-feather="menu"></i></button>
+          <button id="mobile-menu-button" class="sm:hidden focus:outline-none text-gray-700 dark:text-gray-300"
+            aria-label="Toggle navigation"><i data-feather="menu"></i></button>
           <h1 class="text-xl font-semibold">Settings</h1>
         </div>
         <!-- Theme and logout controls -->
         <div class="flex items-center space-x-2">
-          <button id="theme-toggle" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300" aria-label="Toggle theme"><i data-feather="sun"></i></button>
-          <button id="logout-btn" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300" aria-label="Logout"><i data-feather="log-out"></i></button>
+          <button id="theme-toggle"
+            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300"
+            aria-label="Toggle theme"><i data-feather="sun"></i></button>
+          <button id="logout-btn"
+            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300"
+            aria-label="Logout"><i data-feather="log-out"></i></button>
         </div>
       </header>
       <!-- Page content -->
       <main class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-        <h3 class="text-lg font-semibold">Settings</h3>
+        <h3 class="text-lg font-semibold page-title">Settings</h3>
         <!-- Theme toggle -->
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 flex items-center justify-between">
-          <span class="text-gray-700 dark:text-gray-300">Dark Mode</span>
-          <label class="inline-flex relative items-center cursor-pointer">
-            <input type="checkbox" id="settings-theme-toggle" class="sr-only peer">
-            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-500 dark:bg-gray-700 rounded-full peer peer-checked:bg-teal-600 transition-all"></div>
-            <span class="absolute left-1 top-1 w-4 h-4 bg-white dark:bg-gray-300 rounded-full transition-transform peer-checked:translate-x-5"></span>
-          </label>
+        <div class="card p-6 animate-fade-in" style="animation-delay: 0s">
+          <div class="flex items-center justify-between">
+            <span class="text-gray-700 dark:text-gray-300 font-medium">Dark Mode</span>
+            <label class="inline-flex relative items-center cursor-pointer">
+              <input type="checkbox" id="settings-theme-toggle" class="sr-only peer">
+              <div
+                class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-500 dark:bg-gray-700 rounded-full peer peer-checked:bg-teal-600 transition-all">
+              </div>
+              <span
+                class="absolute left-1 top-1 w-4 h-4 bg-white dark:bg-gray-300 rounded-full transition-transform peer-checked:translate-x-5"></span>
+            </label>
+          </div>
         </div>
         <!-- API Key management -->
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 space-y-3">
-          <span class="text-gray-700 dark:text-gray-300 block">API Key</span>
-          <div class="flex items-center space-x-2">
-            <input id="api-key-field" type="text" readonly class="flex-1 px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded">
-            <button id="api-key-toggle" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1 rounded">Show</button>
-            <button id="api-key-regenerate" class="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 rounded">Regenerate</button>
+        <div class="card p-6 animate-fade-in" style="animation-delay: 0.1s">
+          <span class="text-gray-700 dark:text-gray-300 block mb-3 font-medium">API Key</span>
+          <div class="flex items-center space-x-3">
+            <input id="api-key-field" type="text" readonly class="input-field flex-1 bg-gray-50 dark:bg-gray-900/50">
+            <button id="api-key-toggle" class="btn btn-secondary">Show</button>
+            <button id="api-key-regenerate" class="btn btn-primary">Regenerate</button>
           </div>
         </div>
       </main>
@@ -58,7 +73,7 @@
   <!-- Include mock data and shared JS -->
   <!-- Mock data -->
   <script src="data/mock-data.js"></script>
-  
+
   <!-- MVC Architecture -->
   <!-- Services -->
   <script src="services/ApiService.js"></script>
@@ -77,4 +92,5 @@
   <!-- Main App -->
   <script defer src="assets/app-mvc.js"></script>
 </body>
+
 </html>

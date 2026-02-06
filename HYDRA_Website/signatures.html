@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Hydra – Signatures</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js"></script>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+
+<body data-page="signatures" class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 antialiased">
+    <div class="flex h-screen">
+        <aside id="sidebar"
+            class="hidden sm:flex sm:flex-col sm:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+        </aside>
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header
+                class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+                <div class="flex items-center space-x-2">
+                    <button id="mobile-menu-button"
+                        class="sm:hidden focus:outline-none text-gray-700 dark:text-gray-300"><i
+                            data-feather="menu"></i></button>
+                    <h1 class="text-xl font-semibold">Signatures</h1>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="theme-toggle"
+                        class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300"><i
+                            data-feather="sun"></i></button>
+                    <button id="logout-btn"
+                        class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300"><i
+                            data-feather="log-out"></i></button>
+                </div>
+            </header>
+            <main class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold">Attack Signatures</h3>
+                    <button onclick="showModal()"
+                        class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 text-sm flex items-center">
+                        <i data-feather="plus" class="w-4 h-4 mr-1"></i> Add Signature
+                    </button>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-4">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">ID</th>
+                                    <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">Type</th>
+                                    <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">Pattern</th>
+                                    <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="signatures-table" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="sig-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-[500px]">
+            <h3 id="modal-title" class="text-lg font-semibold mb-4">Add Signature</h3>
+            <form id="sig-form">
+                <input type="hidden" id="sig-id">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1">Type</label>
+                    <select id="sig-type"
+                        class="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded">
+                        <option value="SQLi">SQL Injection</option>
+                        <option value="XSS">Cross-Site Scripting</option>
+                        <option value="Command Injection">Command Injection</option>
+                        <option value="Path Traversal">Path Traversal</option>
+                        <option value="SSRF">SSRF</option>
+                        <option value="Custom">Custom</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1">Pattern (Regex)</label>
+                    <textarea id="sig-content" rows="3"
+                        class="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded font-mono text-sm"
+                        placeholder="(?i)(union\s+select|...)"></textarea>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="hideModal()"
+                        class="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded">Cancel</button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="services/StorageService.js"></script>
+    <script src="utils/helpers.js"></script>
+    <script>
+        const BACKEND_URL = 'http://localhost:5000';
+        let editingId = null;
+
+        async function loadSignatures() {
+            try {
+                const resp = await fetch(`${BACKEND_URL}/api/signatures`);
+                const data = await resp.json();
+                renderSignatures(data.signatures || []);
+            } catch (err) { console.error(err); }
+        }
+
+        function renderSignatures(sigs) {
+            document.getElementById('signatures-table').innerHTML = sigs.map(s => `
+        <tr>
+          <td class="px-4 py-2">${s.signature_id}</td>
+          <td class="px-4 py-2"><span class="px-2 py-1 text-xs rounded bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">${s.signature_type}</span></td>
+          <td class="px-4 py-2 font-mono text-xs max-w-md truncate">${escapeHtml(s.signature_content)}</td>
+          <td class="px-4 py-2 space-x-2">
+            <button onclick="editSig(${s.signature_id}, '${s.signature_type}', '${escapeJs(s.signature_content)}')" class="px-2 py-1 bg-blue-600 text-white rounded text-xs">Edit</button>
+            <button onclick="deleteSig(${s.signature_id})" class="px-2 py-1 bg-red-600 text-white rounded text-xs">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+        }
+
+        function escapeHtml(str) { return str.replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        function escapeJs(str) { return str.replace(/'/g, "\\'").replace(/"/g, '\\"'); }
+
+        function showModal() { editingId = null; document.getElementById('modal-title').textContent = 'Add Signature'; document.getElementById('sig-form').reset(); document.getElementById('sig-modal').classList.remove('hidden'); }
+        function hideModal() { document.getElementById('sig-modal').classList.add('hidden'); }
+
+        function editSig(id, type, content) {
+            editingId = id;
+            document.getElementById('modal-title').textContent = 'Edit Signature';
+            document.getElementById('sig-id').value = id;
+            document.getElementById('sig-type').value = type;
+            document.getElementById('sig-content').value = content;
+            document.getElementById('sig-modal').classList.remove('hidden');
+        }
+
+        document.getElementById('sig-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = localStorage.getItem('authToken');
+            if (!token) { alert('Please login'); return; }
+
+            const payload = {
+                signature_type: document.getElementById('sig-type').value,
+                signature_content: document.getElementById('sig-content').value
+            };
+
+            const url = editingId ? `${BACKEND_URL}/api/signatures/${editingId}` : `${BACKEND_URL}/api/signatures`;
+            const method = editingId ? 'PUT' : 'POST';
+
+            try {
+                const resp = await fetch(url, {
+                    method, headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (resp.ok) { hideModal(); loadSignatures(); }
+                else { const err = await resp.json(); alert(err.error); }
+            } catch (err) { console.error(err); }
+        });
+
+        async function deleteSig(id) {
+            if (!confirm('Delete this signature?')) return;
+            const token = localStorage.getItem('authToken');
+            try {
+                await fetch(`${BACKEND_URL}/api/signatures/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                loadSignatures();
+            } catch (err) { console.error(err); }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize theme and standard UI behaviors
+            Helpers.loadPersistedData();
+            Helpers.initThemeToggle();
+            Helpers.initLogout();
+            Helpers.initMobileMenu();
+
+            feather.replace();
+            loadSignatures();
+            fetch('partials/sidebar.html?v=' + Date.now()).then(r => r.text()).then(html => { document.getElementById('sidebar').innerHTML = html; Helpers.highlightActiveNav(); feather.replace(); });
+        });
+    </script>
+</body>
+
+</html>

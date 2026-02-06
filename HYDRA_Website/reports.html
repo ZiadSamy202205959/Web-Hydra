@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Hydra – Reports</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js"></script>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+
+<body data-page="reports" class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 antialiased">
+    <div class="flex h-screen">
+        <aside id="sidebar"
+            class="hidden sm:flex sm:flex-col sm:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+        </aside>
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header
+                class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+                <div class="flex items-center space-x-2">
+                    <button id="mobile-menu-button"
+                        class="sm:hidden focus:outline-none text-gray-700 dark:text-gray-300"><i
+                            data-feather="menu"></i></button>
+                    <h1 class="text-xl font-semibold">Patching Reports</h1>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="theme-toggle"
+                        class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300"><i
+                            data-feather="sun"></i></button>
+                    <button id="logout-btn"
+                        class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300"><i
+                            data-feather="log-out"></i></button>
+                </div>
+            </header>
+            <main class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold">Recommendation Reports</h3>
+                    <div class="flex space-x-2">
+                        <button onclick="loadReports(3)"
+                            class="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-600"
+                            id="btn-3">Last 3 Days</button>
+                        <button onclick="loadReports(7)" class="px-3 py-1 bg-teal-600 text-white rounded text-sm"
+                            id="btn-7">Last 7 Days</button>
+                        <button onclick="loadReports(30)"
+                            class="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-600"
+                            id="btn-30">Last 30 Days</button>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-4">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">ID</th>
+                                    <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">Vulnerability</th>
+                                    <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">Recommendation</th>
+                                    <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">Date</th>
+                                    <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">Download</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reports-table" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
+                        </table>
+                    </div>
+                    <div id="no-reports" class="hidden text-center py-8 text-gray-500">No reports found for this period
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="services/StorageService.js"></script>
+    <script src="utils/helpers.js"></script>
+    <script>
+        const BACKEND_URL = 'http://localhost:5000';
+        let currentDays = 7;
+
+        async function loadReports(days = 7) {
+            currentDays = days;
+            updateButtons();
+
+            try {
+                const resp = await fetch(`${BACKEND_URL}/api/reports?days=${days}`);
+                const data = await resp.json();
+                renderReports(data.reports || []);
+            } catch (err) {
+                console.error('Failed to load reports:', err);
+                document.getElementById('no-reports').classList.remove('hidden');
+            }
+        }
+
+        function updateButtons() {
+            [3, 7, 30].forEach(d => {
+                const btn = document.getElementById(`btn-${d}`);
+                if (d === currentDays) {
+                    btn.className = 'px-3 py-1 bg-teal-600 text-white rounded text-sm';
+                } else {
+                    btn.className = 'px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-600';
+                }
+            });
+        }
+
+        function renderReports(reports) {
+            const tbody = document.getElementById('reports-table');
+            const noReports = document.getElementById('no-reports');
+
+            if (!reports.length) {
+                tbody.innerHTML = '';
+                noReports.classList.remove('hidden');
+                return;
+            }
+
+            noReports.classList.add('hidden');
+            tbody.innerHTML = reports.map(r => `
+        <tr>
+          <td class="px-4 py-2">${r.report_id}</td>
+          <td class="px-4 py-2"><span class="px-2 py-1 text-xs rounded bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">${r.related_vulnerability}</span></td>
+          <td class="px-4 py-2 max-w-md">${r.recommendation_text.substring(0, 150)}${r.recommendation_text.length > 150 ? '...' : ''}</td>
+          <td class="px-4 py-2">${new Date(r.created_at).toLocaleDateString()}</td>
+          <td class="px-4 py-2 space-x-2">
+            <a href="${BACKEND_URL}/api/reports/${r.report_id}/download?format=csv" class="px-2 py-1 bg-green-600 text-white rounded text-xs inline-block">CSV</a>
+            <a href="${BACKEND_URL}/api/reports/${r.report_id}/download?format=pdf" class="px-2 py-1 bg-blue-600 text-white rounded text-xs inline-block">PDF</a>
+          </td>
+        </tr>
+      `).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize theme and standard UI behaviors
+            Helpers.loadPersistedData();
+            Helpers.initThemeToggle();
+            Helpers.initLogout();
+            Helpers.initMobileMenu();
+
+            feather.replace();
+            loadReports(7);
+            fetch('partials/sidebar.html?v=' + Date.now()).then(r => r.text()).then(html => {
+                document.getElementById('sidebar').innerHTML = html;
+                Helpers.highlightActiveNav(); // Add highlight
+                feather.replace();
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -102,6 +102,48 @@ class Helpers {
             </a>
           </li>
           <li>
+            <a href="alerts.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="alerts">
+              <i data-feather="bell" class="mr-3"></i>
+              <span>Alerts</span>
+            </a>
+          </li>
+          <li>
+            <a href="restrictions.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="restrictions">
+              <i data-feather="slash" class="mr-3"></i>
+              <span>Restrictions</span>
+            </a>
+          </li>
+          <li>
+            <a href="signatures.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="signatures">
+              <i data-feather="code" class="mr-3"></i>
+              <span>Signatures</span>
+            </a>
+          </li>
+          <li>
+            <a href="reports.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="reports">
+              <i data-feather="file-text" class="mr-3"></i>
+              <span>Reports</span>
+            </a>
+          </li>
+          <li>
+            <a href="ai-models.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="ai-models">
+              <i data-feather="cpu" class="mr-3"></i>
+              <span>AI Models</span>
+            </a>
+          </li>
+          <li>
+            <a href="syslog.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="syslog">
+              <i data-feather="terminal" class="mr-3"></i>
+              <span>System Logs</span>
+            </a>
+          </li>
+          <li>
+            <a href="user-profiles.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="user-profiles">
+              <i data-feather="user-x" class="mr-3"></i>
+              <span>User Profiles</span>
+            </a>
+          </li>
+          <li>
             <a href="users.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="users">
               <i data-feather="users" class="mr-3"></i>
               <span>User Management</span>
@@ -118,7 +160,7 @@ class Helpers {
     `;
 
     try {
-      const response = await fetch('partials/sidebar.html');
+      const response = await fetch('partials/sidebar.html?v=' + Date.now());
       if (response.ok) {
         const html = await response.text();
         sidebar.innerHTML = html;

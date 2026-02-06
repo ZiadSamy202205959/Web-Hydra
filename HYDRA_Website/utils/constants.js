@@ -1,19 +1,19 @@
 // Constants and configuration
 const ROLE_PERMISSIONS = {
   admin: {
-    pages: ['dashboard', 'threat', 'intelligence', 'rules', 'logs', 'test', 'learning', 'recommendations', 'settings', 'users'],
+    pages: ['dashboard', 'threat', 'intelligence', 'rules', 'logs', 'test', 'learning', 'recommendations', 'alerts', 'restrictions', 'signatures', 'reports', 'ai-models', 'syslog', 'user-profiles', 'settings', 'users', 'database'],
     manageRules: true,
   },
   operator: {
-    pages: ['dashboard', 'threat', 'intelligence', 'rules', 'logs', 'test', 'recommendations'],
+    pages: ['dashboard', 'threat', 'intelligence', 'rules', 'logs', 'test', 'recommendations', 'alerts', 'restrictions', 'signatures', 'reports', 'ai-models', 'syslog'],
     manageRules: true,
   },
   analyst: {
-    pages: ['dashboard', 'threat', 'intelligence', 'logs', 'test', 'learning', 'recommendations'],
+    pages: ['dashboard', 'threat', 'intelligence', 'logs', 'test', 'learning', 'recommendations', 'alerts', 'reports', 'ai-models', 'syslog', 'user-profiles'],
     manageRules: false,
   },
   viewer: {
-    pages: ['dashboard', 'threat', 'intelligence', 'logs', 'test'],
+    pages: ['dashboard', 'threat', 'intelligence', 'logs', 'test', 'alerts', 'reports', 'ai-models'],
     manageRules: false,
   },
 };

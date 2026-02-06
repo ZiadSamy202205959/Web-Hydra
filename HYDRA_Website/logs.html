@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,84 +14,107 @@
   <!-- Shared CSS -->
   <link rel="stylesheet" href="assets/style.css">
 </head>
+
 <body data-page="logs" class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 antialiased">
   <div class="flex h-screen">
     <!-- Sidebar -->
-    <aside id="sidebar" class="hidden sm:flex sm:flex-col sm:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"></aside>
+    <aside id="sidebar"
+      class="hidden sm:flex sm:flex-col sm:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+    </aside>
     <!-- Main content area -->
     <div class="flex-1 flex flex-col overflow-hidden">
       <!-- Topbar -->
-      <header class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+      <header
+        class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
         <div class="flex items-center space-x-2">
-          <button id="mobile-menu-button" class="sm:hidden focus:outline-none text-gray-700 dark:text-gray-300" aria-label="Toggle navigation"><i data-feather="menu"></i></button>
+          <button id="mobile-menu-button" class="sm:hidden focus:outline-none text-gray-700 dark:text-gray-300"
+            aria-label="Toggle navigation"><i data-feather="menu"></i></button>
           <h1 class="text-xl font-semibold">Logs</h1>
         </div>
         <!-- Theme and logout controls -->
         <div class="flex items-center space-x-2">
-          <button id="theme-toggle" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300" aria-label="Toggle theme"><i data-feather="sun"></i></button>
-          <button id="logout-btn" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300" aria-label="Logout"><i data-feather="log-out"></i></button>
+          <button id="theme-toggle"
+            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300"
+            aria-label="Toggle theme"><i data-feather="sun"></i></button>
+          <button id="logout-btn"
+            class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300"
+            aria-label="Logout"><i data-feather="log-out"></i></button>
         </div>
       </header>
       <!-- Page content -->
       <main class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-        <h3 class="text-lg font-semibold">Logs</h3>
-        <!-- Filters -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div>
-            <label class="block text-sm font-medium">Search</label>
-            <input id="logs-search" type="text" placeholder="Search message" class="mt-1 w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:outline-none">
+        <main class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+          <h3 class="text-lg font-semibold page-title">System Logs</h3>
+          <!-- Filters -->
+          <div class="card p-6 animate-fade-in" style="animation-delay: 0s">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-sm font-medium mb-1">Search</label>
+                <div class="relative">
+                  <i data-feather="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
+                  <input id="logs-search" type="text" placeholder="Search message..." class="input-field pl-9">
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Type</label>
+                <select id="logs-type-filter" class="input-field">
+                  <option value="">All Types</option>
+                  <option value="Info">Info</option>
+                  <option value="Warning">Warning</option>
+                  <option value="Attack">Attack</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Severity</label>
+                <select id="logs-severity-filter" class="input-field">
+                  <option value="">All Severities</option>
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                  <option value="Critical">Critical</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium mb-1">Date</label>
+                <input id="logs-date-filter" type="date" class="input-field">
+              </div>
+            </div>
           </div>
-          <div>
-            <label class="block text-sm font-medium">Type</label>
-            <select id="logs-type-filter" class="mt-1 w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:outline-none">
-              <option value="">All</option>
-              <option value="Info">Info</option>
-              <option value="Warning">Warning</option>
-              <option value="Attack">Attack</option>
-            </select>
+
+          <!-- Logs table -->
+          <div class="card p-0 overflow-hidden animate-fade-in" style="animation-delay: 0.1s">
+            <div class="overflow-x-auto">
+              <table class="data-table text-sm">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Type</th>
+                    <th>Severity</th>
+                    <th>Message</th>
+                    <th>Time</th>
+                  </tr>
+                </thead>
+                <tbody id="logs-table"></tbody>
+              </table>
+            </div>
+            <!-- Pagination -->
+            <div
+              class="flex items-center justify-between p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+              <button id="logs-prev" class="btn btn-secondary text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                <i data-feather="chevron-left" class="w-4 h-4 mr-1"></i> Prev
+              </button>
+              <span id="logs-page-info" class="text-sm text-gray-500 dark:text-gray-400 font-medium">Page 1</span>
+              <button id="logs-next" class="btn btn-secondary text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                Next <i data-feather="chevron-right" class="w-4 h-4 ml-1"></i>
+              </button>
+            </div>
           </div>
-          <div>
-            <label class="block text-sm font-medium">Severity</label>
-            <select id="logs-severity-filter" class="mt-1 w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:outline-none">
-              <option value="">All</option>
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
-              <option value="Critical">Critical</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium">Date</label>
-            <input id="logs-date-filter" type="date" class="mt-1 w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded focus:outline-none">
-          </div>
-        </div>
-        <!-- Logs table -->
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-4">
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
-              <thead><tr>
-                <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">ID</th>
-                <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">Type</th>
-                <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">Severity</th>
-                <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">Message</th>
-                <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">Time</th>
-              </tr></thead>
-              <tbody id="logs-table" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
-            </table>
-          </div>
-          <!-- Pagination -->
-          <div class="flex items-center justify-between mt-4">
-            <button id="logs-prev" class="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded disabled:opacity-50">Prev</button>
-            <span id="logs-page-info" class="text-sm text-gray-500 dark:text-gray-400"></span>
-            <button id="logs-next" class="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded disabled:opacity-50">Next</button>
-          </div>
-        </div>
-      </main>
+        </main>
     </div>
   </div>
   <!-- Mock data -->
   <script src="data/mock-data.js"></script>
-  
+
   <!-- MVC Architecture -->
   <!-- Services -->
   <script src="services/ApiService.js"></script>
@@ -109,4 +133,5 @@
   <!-- Main App -->
   <script defer src="assets/app-mvc.js"></script>
 </body>
+
 </html>

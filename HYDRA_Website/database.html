@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Hydra – Database Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js"></script>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+
+<body data-page="database" class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 antialiased">
+    <div class="flex h-screen">
+        <aside id="sidebar"
+            class="hidden sm:flex sm:flex-col sm:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
+        </aside>
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <header
+                class="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+                <div class="flex items-center space-x-2">
+                    <button id="mobile-menu-button"
+                        class="sm:hidden focus:outline-none text-gray-700 dark:text-gray-300"><i
+                            data-feather="menu"></i></button>
+                    <h1 class="text-xl font-semibold">Database Admin</h1>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="theme-toggle"
+                        class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300"><i
+                            data-feather="sun"></i></button>
+                    <button id="logout-btn"
+                        class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none text-gray-700 dark:text-gray-300"><i
+                            data-feather="log-out"></i></button>
+                </div>
+            </header>
+            <main class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+                <!-- Table Selector -->
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex items-center space-x-4">
+                        <label class="text-sm font-medium">Select Table:</label>
+                        <select id="table-selector"
+                            class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500">
+                            <option value="user">User</option>
+                            <option value="waf_log">WAF Log</option>
+                            <option value="alert">Alert</option>
+                            <option value="restriction">Restriction</option>
+                            <option value="signature">Signature</option>
+                            <option value="model">Model</option>
+                            <option value="patching_report">Patching Report</option>
+                            <option value="suspicious_user_profile">Suspicious User Profile</option>
+                            <option value="whitelisted_request">Whitelisted Request</option>
+                            <option value="sys_log">System Log</option>
+                        </select>
+                    </div>
+                    <button onclick="showAddModal()"
+                        class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 text-sm flex items-center">
+                        <i data-feather="plus" class="w-4 h-4 mr-1"></i> Add Record
+                    </button>
+                </div>
+
+                <!-- Data Table -->
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-4">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+                            <thead id="table-header">
+                            </thead>
+                            <tbody id="table-body" class="divide-y divide-gray-200 dark:divide-gray-700">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="loading-indicator" class="hidden text-center py-8">
+                        <div
+                            class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-teal-500 border-t-transparent">
+                        </div>
+                        <p class="mt-2 text-gray-500">Loading...</p>
+                    </div>
+                    <div id="empty-state" class="hidden text-center py-8 text-gray-500">
+                        No records found in this table.
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="record-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <h3 id="modal-title" class="text-lg font-semibold mb-4">Add Record</h3>
+            <form id="record-form">
+                <div id="form-fields" class="space-y-4">
+                    <!-- Dynamic fields will be inserted here -->
+                </div>
+                <input type="hidden" id="edit-id" value="">
+                <div class="flex justify-end space-x-2 mt-6">
+                    <button type="button" onclick="hideModal()"
+                        class="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded-lg">Cancel</button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="data/mock-data.js"></script>
+    <script src="services/ApiService.js"></script>
+    <script src="services/StorageService.js"></script>
+    <script src="utils/constants.js"></script>
+    <script src="utils/helpers.js"></script>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:5000';
+        let currentTable = 'user';
+        let currentData = [];
+
+        // Table schema definitions
+        const TABLE_SCHEMAS = {
+            user: {
+                columns: ['user_id', 'username', 'email', 'role'],
+                editable: ['username', 'email', 'role', 'password'],
+                labels: { user_id: 'ID', username: 'Username', email: 'Email', role: 'Role', password: 'Password' },
+                types: { role: 'select', password: 'password' },
+                options: { role: ['admin', 'user', 'analyst'] },
+                idField: 'user_id'
+            },
+            waf_log: {
+                columns: ['wlog_id', 'wlog_type', 'severity', 'detection_source', 'wlog_timestamp'],
+                editable: ['intercepted_req', 'wlog_type', 'severity', 'detection_source'],
+                labels: { wlog_id: 'ID', intercepted_req: 'Request', wlog_type: 'Type', severity: 'Severity', detection_source: 'Source', wlog_timestamp: 'Timestamp' },
+                types: { severity: 'select', intercepted_req: 'textarea' },
+                options: { severity: ['Low', 'Medium', 'High', 'Critical'] },
+                idField: 'wlog_id'
+            },
+            alert: {
+                columns: ['alert_id', 'alert_type', 'status', 'created_at', 'wlog_id'],
+                editable: ['alert_type', 'status', 'wlog_id'],
+                labels: { alert_id: 'ID', alert_type: 'Type', status: 'Status', created_at: 'Created', wlog_id: 'WAF Log ID' },
+                types: { status: 'select' },
+                options: { status: ['open', 'checked', 'resolved'] },
+                idField: 'alert_id'
+            },
+            restriction: {
+                columns: ['restriction_id', 'restriction_type', 'restriction_description', 'created_at'],
+                editable: ['restriction_type', 'restriction_description'],
+                labels: { restriction_id: 'ID', restriction_type: 'Type', restriction_description: 'Value', created_at: 'Created' },
+                types: { restriction_type: 'select' },
+                options: { restriction_type: ['ip', 'hash', 'domain'] },
+                idField: 'restriction_id'
+            },
+            signature: {
+                columns: ['signature_id', 'signature_type', 'signature_content'],
+                editable: ['signature_type', 'signature_content'],
+                labels: { signature_id: 'ID', signature_type: 'Type', signature_content: 'Content' },
+                types: { signature_content: 'textarea' },
+                options: {},
+                idField: 'signature_id'
+            },
+            model: {
+                columns: ['model_id', 'model_type', 'model_threshold', 'model_description'],
+                editable: ['model_type', 'model_threshold', 'model_description'],
+                labels: { model_id: 'ID', model_type: 'Name', model_threshold: 'Threshold', model_description: 'Description' },
+                types: { model_threshold: 'number', model_description: 'textarea' },
+                options: {},
+                idField: 'model_id'
+            },
+            patching_report: {
+                columns: ['report_id', 'report_details', 'report_timestamp', 'wlog_id'],
+                editable: ['report_details', 'wlog_id'],
+                labels: { report_id: 'ID', report_details: 'Details', report_timestamp: 'Created', wlog_id: 'WAF Log ID' },
+                types: { report_details: 'textarea' },
+                options: {},
+                idField: 'report_id'
+            },
+            suspicious_user_profile: {
+                columns: ['sus_user_id', 'sus_username', 'ip_address', 'suspicion_level', 'created_at'],
+                editable: ['sus_username', 'pc_number', 'ip_address', 'mac_address', 'session_cookie', 'suspicion_level'],
+                labels: { sus_user_id: 'ID', sus_username: 'Username', pc_number: 'PC', ip_address: 'IP', mac_address: 'MAC', session_cookie: 'Session', suspicion_level: 'Level', created_at: 'Created' },
+                types: { suspicion_level: 'select', session_cookie: 'textarea' },
+                options: { suspicion_level: ['Low', 'Medium', 'High', 'Critical'] },
+                idField: 'sus_user_id'
+            },
+            whitelisted_request: {
+                columns: ['wl_id', 'wlog_id', 'reason', 'user_id', 'made_at'],
+                editable: ['wlog_id', 'reason', 'user_id'],
+                labels: { wl_id: 'ID', wlog_id: 'WAF Log ID', reason: 'Reason', user_id: 'User ID', made_at: 'Created' },
+                types: { reason: 'textarea' },
+                options: {},
+                idField: 'wl_id'
+            },
+            sys_log: {
+                columns: ['slog_id', 'message', 'slog_timestamp'],
+                editable: ['message'],
+                labels: { slog_id: 'ID', message: 'Message', slog_timestamp: 'Timestamp' },
+                types: { message: 'textarea' },
+                options: {},
+                idField: 'slog_id'
+            }
+        };
+
+        // Check admin access
+        function checkAdminAccess() {
+            const role = StorageService.getRole();
+            if (role !== 'admin') {
+                alert('Access denied. Admin only.');
+                window.location.href = 'login.html';
+                return false;
+            }
+            return true;
+        }
+
+        // Get or refresh auth token
+        async function getAuthToken() {
+            let token = localStorage.getItem('authToken');
+            if (token) return token;
+
+            // Try to auto-login with stored credentials if we have a role but no token
+            const username = StorageService.getUsername();
+            if (!username) return null;
+
+            // Attempt to login to get a fresh token
+            try {
+                const resp = await fetch(`${BACKEND_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: username, password: 'admin123' })
+                });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (data.token) {
+                        localStorage.setItem('authToken', data.token);
+                        return data.token;
+                    }
+                }
+            } catch (err) {
+                console.error('Auto-login failed:', err);
+            }
+            return null;
+        }
+
+        // Load table data
+        async function loadTableData() {
+            if (!checkAdminAccess()) return;
+
+            const token = await getAuthToken();
+            if (!token) {
+                alert('Please login again to access the database.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            document.getElementById('loading-indicator').classList.remove('hidden');
+            document.getElementById('empty-state').classList.add('hidden');
+            document.getElementById('table-body').innerHTML = '';
+
+            try {
+                const resp = await fetch(`${BACKEND_URL}/api/db/${currentTable}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (resp.status === 401 || resp.status === 403) {
+                    // Token expired, clear and redirect
+                    localStorage.removeItem('authToken');
+                    alert('Session expired. Please login again.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const data = await resp.json();
+                currentData = data.records || [];
+
+                document.getElementById('loading-indicator').classList.add('hidden');
+
+                if (currentData.length === 0) {
+                    document.getElementById('empty-state').classList.remove('hidden');
+                }
+
+                renderTable();
+            } catch (err) {
+                console.error('Failed to load data:', err);
+                document.getElementById('loading-indicator').classList.add('hidden');
+                document.getElementById('empty-state').classList.remove('hidden');
+            }
+        }
+
+        // Render table
+        function renderTable() {
+            const schema = TABLE_SCHEMAS[currentTable];
+            const thead = document.getElementById('table-header');
+            const tbody = document.getElementById('table-body');
+
+            // Render header
+            thead.innerHTML = `<tr>
+                ${schema.columns.map(col => `<th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">${schema.labels[col] || col}</th>`).join('')}
+                <th class="px-4 py-2 text-left text-gray-500 dark:text-gray-400">Actions</th>
+            </tr>`;
+
+            // Render body
+            tbody.innerHTML = currentData.map(record => `<tr>
+                ${schema.columns.map(col => `<td class="px-4 py-2">${formatCell(record[col])}</td>`).join('')}
+                <td class="px-4 py-2">
+                    <button onclick="editRecord(${record[schema.idField]})" class="px-2 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 mr-1">Edit</button>
+                    <button onclick="deleteRecord(${record[schema.idField]})" class="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700">Delete</button>
+                </td>
+            </tr>`).join('');
+
+            feather.replace();
+        }
+
+        function formatCell(value) {
+            if (value === null || value === undefined) return '<span class="text-gray-400">-</span>';
+            if (typeof value === 'string' && value.length > 50) return value.substring(0, 50) + '...';
+            return value;
+        }
+
+        // Show add modal
+        function showAddModal() {
+            document.getElementById('modal-title').textContent = 'Add Record';
+            document.getElementById('edit-id').value = '';
+            renderFormFields();
+            document.getElementById('record-modal').classList.remove('hidden');
+        }
+
+        // Edit record
+        function editRecord(id) {
+            const schema = TABLE_SCHEMAS[currentTable];
+            const record = currentData.find(r => r[schema.idField] === id);
+            if (!record) return;
+
+            document.getElementById('modal-title').textContent = 'Edit Record';
+            document.getElementById('edit-id').value = id;
+            renderFormFields(record);
+            document.getElementById('record-modal').classList.remove('hidden');
+        }
+
+        // Render form fields
+        function renderFormFields(record = null) {
+            const schema = TABLE_SCHEMAS[currentTable];
+            const container = document.getElementById('form-fields');
+
+            container.innerHTML = schema.editable.map(field => {
+                const label = schema.labels[field] || field;
+                const type = schema.types[field] || 'text';
+                const value = record ? (record[field] || '') : '';
+                const options = schema.options[field] || [];
+
+                if (type === 'select') {
+                    return `<div>
+                        <label class="block text-sm font-medium mb-1">${label}</label>
+                        <select name="${field}" class="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded">
+                            ${options.map(opt => `<option value="${opt}" ${value === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                        </select>
+                    </div>`;
+                } else if (type === 'textarea') {
+                    return `<div>
+                        <label class="block text-sm font-medium mb-1">${label}</label>
+                        <textarea name="${field}" rows="3" class="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded">${value}</textarea>
+                    </div>`;
+                } else {
+                    return `<div>
+                        <label class="block text-sm font-medium mb-1">${label}</label>
+                        <input type="${type}" name="${field}" value="${value}" class="w-full px-3 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded">
+                    </div>`;
+                }
+            }).join('');
+        }
+
+        // Hide modal
+        function hideModal() {
+            document.getElementById('record-modal').classList.add('hidden');
+        }
+
+        // Delete record
+        async function deleteRecord(id) {
+            if (!confirm('Are you sure you want to delete this record?')) return;
+
+            const token = await getAuthToken();
+            try {
+                const resp = await fetch(`${BACKEND_URL}/api/db/${currentTable}/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (resp.ok) {
+                    loadTableData();
+                } else {
+                    const err = await resp.json();
+                    alert(err.error || 'Failed to delete');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Failed to delete record');
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('record-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const token = await getAuthToken();
+            const editId = document.getElementById('edit-id').value;
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const url = editId
+                    ? `${BACKEND_URL}/api/db/${currentTable}/${editId}`
+                    : `${BACKEND_URL}/api/db/${currentTable}`;
+                const method = editId ? 'PUT' : 'POST';
+
+                const resp = await fetch(url, {
+                    method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (resp.ok) {
+                    hideModal();
+                    loadTableData();
+                } else {
+                    const err = await resp.json();
+                    alert(err.error || 'Failed to save');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Failed to save record');
+            }
+        });
+
+        // Table selector change
+        document.getElementById('table-selector').addEventListener('change', (e) => {
+            currentTable = e.target.value;
+            loadTableData();
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            Helpers.loadPersistedData();
+            Helpers.initThemeToggle();
+            Helpers.initLogout();
+            Helpers.initMobileMenu();
+
+            feather.replace();
+
+            if (!checkAdminAccess()) return;
+
+            loadTableData();
+
+            fetch('partials/sidebar.html?v=' + Date.now()).then(r => r.text()).then(html => {
+                document.getElementById('sidebar').innerHTML = html;
+                Helpers.highlightActiveNav();
+                feather.replace();
+            });
+        });
+    </script>
+</body>
+
+</html>

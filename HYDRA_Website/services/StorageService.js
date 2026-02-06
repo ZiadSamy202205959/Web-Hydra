@@ -103,6 +103,7 @@ class StorageService {
     this.removeItem('webHydraRole');
     this.removeItem('webHydraUsername');
     this.removeItem('webHydraLoggedIn');
+    this.removeItem('authToken');
   }
 }
 
