@@ -1,0 +1,13 @@
+{
+  "HYB_MAX_LEN": 256,
+  "VOCAB_MAX": 128,
+  "AE_T2": 3.796452045440674,
+  "AE_THRESHOLD_PCTL": 99.5,
+  "AE_EMB": 64,
+  "AE_LATENT": 128,
+  "files": {
+    "CHAR_VOCAB_FILE": "ae_artifacts\\char_vocab.json",
+    "AE_MODEL_FILE": "ae_artifacts\\char_ae_best.pt",
+    "AE_THRESH_FILE": "ae_artifacts\\ae_threshold.json"
+  }
+}
