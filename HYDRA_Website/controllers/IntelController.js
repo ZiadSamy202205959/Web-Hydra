@@ -93,7 +93,7 @@ class IntelController {
                     </div>
                     <p class="text-xs text-gray-500 dark:text-gray-400">By ${item.author} • ${new Date(item.created).toLocaleDateString()}</p>
                     <div class="mt-1 flex gap-1 flex-wrap">
-                        ${item.tags.map(t => `<span class="text-[10px] bg-gray-100 dark:bg-gray-700 px-1 rounded">${t}</span>`).join('')}
+                        ${(item.tags || []).map(t => `<span class="text-[10px] bg-gray-100 dark:bg-gray-700 px-1 rounded">${t}</span>`).join('')}
                     </div>
                 `;
                 container.appendChild(el);

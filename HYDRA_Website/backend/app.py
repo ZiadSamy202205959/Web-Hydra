@@ -817,7 +817,13 @@ def feed_otx():
         resp.raise_for_status()
         
         normalized = [
-            {'name': item.get('name'), 'id': item.get('id'), 'created': item.get('created'), 'author': item.get('author_name')}
+            {
+                'name': item.get('name'), 
+                'id': item.get('id'), 
+                'created': item.get('created'), 
+                'author': item.get('author_name'),
+                'tags': item.get('tags', [])
+            }
             for item in resp.json().get('results', [])
         ]
         result = {'provider': 'otx', 'data': normalized}
