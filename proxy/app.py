@@ -255,6 +255,7 @@ async def get_logs(limit: int = 100, offset: int = 0):
             "type": log_type,
             "severity": severity,
             "message": f"{log.get('method', 'UNKNOWN')} {log.get('url', '')} - {reason}",
+            "payload": f"{log.get('body', '')} {log.get('url', '')}",
             "timestamp": int(log.get("ts", time.time()) * 1000)  # Convert to milliseconds
         })
     

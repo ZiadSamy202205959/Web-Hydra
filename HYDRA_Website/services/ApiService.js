@@ -309,7 +309,7 @@ class ApiService {
   }
   // --- Patching / LLaMA ---
 
-  async generateRecommendation(description, context = {}) {
+  async generateRecommendation(description, context = {}, wlogId = null) {
     try {
       const response = await fetch('http://localhost:5000/api/patch/recommend', {
         method: 'POST',
@@ -318,7 +318,8 @@ class ApiService {
         },
         body: JSON.stringify({
           attack_description: description,
-          context: context
+          context: context,
+          wlog_id: wlogId
         })
       });
 

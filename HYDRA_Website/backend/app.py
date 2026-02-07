@@ -358,13 +358,37 @@ def download_report(report_id):
     if format_type == 'csv':
         output = io.StringIO()
         writer = csv.writer(output)
-        writer.writerow(['Report ID', 'Recommendation', 'Vulnerability', 'Created At'])
-        writer.writerow([
-            report.report_id,
-            report.report_details,
-            report.waf_log.wlog_type if report.waf_log else 'Unknown',
-            report.report_timestamp.isoformat()
-        ])
+        
+        # Check if details is JSON
+        try:
+            details = json.loads(report.report_details)
+            is_json = True
+        except:
+            is_json = False
+
+        if is_json:
+            writer.writerow(['Report ID', 'Attack Type', 'Root Cause', 'Mitigations', 'Virtual Patches', 'Vulnerability', 'Created At'])
+            mitigations_str = "; ".join([f"[{m['category']}] {m['description']}" for m in details.get('mitigations', [])])
+            patches_str = "; ".join([f"[{p['target']}] {p['rule']}" for p in details.get('virtual_patches', [])])
+            
+            writer.writerow([
+                report.report_id,
+                details.get('attack_type', 'Unknown'),
+                details.get('root_cause', ''),
+                mitigations_str,
+                patches_str,
+                report.waf_log.wlog_type if report.waf_log else 'Unknown',
+                report.report_timestamp.isoformat()
+            ])
+        else:
+            writer.writerow(['Report ID', 'Recommendation', 'Vulnerability', 'Created At'])
+            writer.writerow([
+                report.report_id,
+                report.report_details,
+                report.waf_log.wlog_type if report.waf_log else 'Unknown',
+                report.report_timestamp.isoformat()
+            ])
+            
         output.seek(0)
         return Response(
             output.getvalue(),
@@ -377,14 +401,59 @@ def download_report(report_id):
             from fpdf import FPDF
             pdf = FPDF()
             pdf.add_page()
-            pdf.set_font('Arial', 'B', 16)
-            pdf.cell(0, 10, f'Patching Report #{report.report_id}', ln=True)
-            pdf.set_font('Arial', '', 12)
-            pdf.cell(0, 10, f'Date: {report.report_timestamp.strftime("%Y-%m-%d %H:%M")}', ln=True)
-            pdf.cell(0, 10, f'Vulnerability: {report.waf_log.wlog_type if report.waf_log else "Unknown"}', ln=True)
-            pdf.multi_cell(0, 10, f'Recommendation:\n{report.report_details}')
             
-            pdf_output = pdf.output(dest='S').encode('latin-1')
+            # Try to parse JSON
+            try:
+                details = json.loads(report.report_details)
+                is_json = True
+            except:
+                is_json = False
+
+            pdf.set_font('Arial', 'B', 18)
+            pdf.set_text_color(20, 158, 140) # Teal accent
+            pdf.cell(0, 15, f'Patching Report #{report.report_id}', ln=True, align='C')
+            pdf.ln(5)
+
+            pdf.set_font('Arial', '', 10)
+            pdf.set_text_color(100, 100, 100)
+            pdf.cell(0, 10, f'Generated on: {report.report_timestamp.strftime("%Y-%m-%d %H:%M:%S")}', ln=True)
+            pdf.cell(0, 10, f'Severity: {report.waf_log.severity if report.waf_log else "Medium"}', ln=True)
+            pdf.ln(5)
+
+            if is_json:
+                # Attack Summary
+                pdf.set_font('Arial', 'B', 14)
+                pdf.set_text_color(0, 0, 0)
+                pdf.cell(0, 10, f'Attack Type: {details.get("attack_type", "Unknown")}', ln=True)
+                
+                pdf.set_font('Arial', 'B', 12)
+                pdf.cell(0, 10, 'Root Cause Analysis:', ln=True)
+                pdf.set_font('Arial', '', 11)
+                pdf.multi_cell(0, 8, details.get('root_cause', 'No analysis available.'))
+                pdf.ln(5)
+
+                # Mitigations
+                pdf.set_font('Arial', 'B', 12)
+                pdf.cell(0, 10, 'Recommended Mitigations:', ln=True)
+                pdf.set_font('Arial', '', 11)
+                for m in details.get('mitigations', []):
+                    pdf.multi_cell(0, 8, f"- [{m['category'].upper()}] {m['description']}")
+                pdf.ln(5)
+
+                # Virtual Patches
+                if details.get('virtual_patches'):
+                    pdf.set_font('Arial', 'B', 12)
+                    pdf.cell(0, 10, 'Suggested Virtual Patches:', ln=True)
+                    pdf.set_font('Arial', 'I', 10)
+                    for p in details.get('virtual_patches', []):
+                        pdf.multi_cell(0, 8, f"Target: {p['target']} | Rule: {p['rule']}")
+            else:
+                pdf.set_font('Arial', 'B', 12)
+                pdf.cell(0, 10, 'Recommendation Details:', ln=True)
+                pdf.set_font('Arial', '', 11)
+                pdf.multi_cell(0, 10, report.report_details)
+            
+            pdf_output = pdf.output(dest='S').encode('latin-1', 'replace')
             return Response(
                 pdf_output,
                 mimetype='application/pdf',
@@ -846,6 +915,7 @@ def recommend_patch():
 
     description = data['attack_description']
     context = data.get('context', {})
+    wlog_id = data.get('wlog_id')
 
     desc_hash = hashlib.sha256(description.encode()).hexdigest()
     cached = get_patch_cache(desc_hash)
@@ -853,18 +923,23 @@ def recommend_patch():
         return jsonify({**cached, '_cached': True})
 
     try:
+        print(f"[DEBUG] Analyzing attack for wlog_id: {wlog_id}")
         result = llama_service.analyze_attack(description, context)
         if 'error' in result:
+            print(f"[DEBUG] AI Analysis failed: {result['error']}")
             return jsonify(result), 500
         
         set_patch_cache(desc_hash, result)
         
-        # Store as patching report
+        # Store as patching report with FULL JSON details
+        print(f"[DEBUG] Saving report to DB for wlog_id: {wlog_id}")
         report = PatchingReport(
-            report_details=result.get('recommendation', description)
+            report_details=json.dumps(result),
+            wlog_id=wlog_id
         )
         db.session.add(report)
         db.session.commit()
+        print(f"[DEBUG] Report saved with ID: {report.report_id}")
         
         return jsonify({**result, '_cached': False})
     
