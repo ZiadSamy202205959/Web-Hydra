@@ -22,13 +22,13 @@ class AuthModel {
         if (result.token) {
           localStorage.setItem('authToken', result.token);
         }
-        StorageService.setRole(result.user.role || 'user');
+        StorageService.setRole('admin');
         StorageService.setUsername(result.user.username || username);
         StorageService.setItem('webHydraLoggedIn', 'true');
         return {
           success: true,
           user: result.user,
-          redirectUrl: result.user.role === 'admin' ? 'admin.html' : 'user.html',
+          redirectUrl: 'index.html',
         };
       }
       return { success: false, message: result.message || 'Invalid credentials' };
@@ -48,7 +48,7 @@ class AuthModel {
       return {
         success: true,
         user: result.user,
-        redirectUrl: result.user.role === 'admin' ? 'admin.html' : 'user.html',
+        redirectUrl: 'index.html',
       };
     }
     return result;

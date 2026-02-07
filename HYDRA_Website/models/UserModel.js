@@ -1,4 +1,4 @@
-// User Model - Manages user data and operations
+// User Model - Manages user data and operations (Admin-only access)
 class UserModel {
   constructor() {
     this.initializeDefaultUsers();
@@ -7,9 +7,9 @@ class UserModel {
   initializeDefaultUsers() {
     let users = StorageService.getUsers();
     if (!Array.isArray(users) || !users.length) {
+      // Only admin user is allowed in the system
       users = [
         { username: 'admin', password: 'admin123', role: 'admin' },
-        { username: 'user', password: 'user123', role: 'viewer' },
       ];
       StorageService.setUsers(users);
     }
@@ -57,10 +57,10 @@ class UserModel {
     if (index < 0 || index >= users.length) {
       return { success: false, message: 'Invalid user index.' };
     }
-    
+
     const user = users[index];
     const updatedUser = { ...user, ...updates };
-    
+
     // Check for duplicate username (excluding current user)
     const duplicate = users.findIndex(
       (u, i) => u.username === updatedUser.username && i !== index
@@ -68,7 +68,7 @@ class UserModel {
     if (duplicate !== -1) {
       return { success: false, message: 'A user with that username already exists.' };
     }
-    
+
     users[index] = updatedUser;
     StorageService.setUsers(users);
     return { success: true, user: updatedUser };
@@ -79,17 +79,17 @@ class UserModel {
     if (index < 0 || index >= users.length) {
       return { success: false, message: 'Invalid user index.' };
     }
-    
+
     const user = users[index];
     if (user.username === 'admin') {
       return { success: false, message: 'Cannot delete admin user.' };
     }
-    
+
     const currentUsername = StorageService.getUsername();
     if (user.username === currentUsername) {
       return { success: false, message: 'You cannot delete your own account while logged in.' };
     }
-    
+
     users.splice(index, 1);
     StorageService.setUsers(users);
     return { success: true };

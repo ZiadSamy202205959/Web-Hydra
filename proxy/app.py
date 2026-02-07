@@ -99,7 +99,7 @@ UPSTREAM = "http://127.0.0.1:3001" # Default to Juice Shop, prefer WAF_SETTINGS
 
 # Dataset log location
 os.makedirs("dataset", exist_ok=True)
-LOG_PATH = "dataset/suspicious.jsonl"
+LOG_PATH = "dataset/traffic.jsonl"
 REQUEST_COUNTER = 0  # Simple counter for total requests
 
 
@@ -158,7 +158,7 @@ async def health():
 
 
 def load_logs():
-    """Load all log entries from the suspicious.jsonl file"""
+    """Load all log entries from the traffic.jsonl file"""
     logs = []
     if os.path.exists(LOG_PATH):
         try:
@@ -520,6 +520,14 @@ async def waf_entry(req: Request, path: str):
             log_entry["reason"] = f"SIG:{sig_id}"
             with open(LOG_PATH, "a") as f:
                 f.write(json.dumps(log_entry) + "\n")
+            try:
+                print(f"Attempting ingestion for SIG:{sig_id}")
+                resp = httpx.post("http://127.0.0.1:5000/api/ingest_log", json={**log_entry, "severity": "High", "detection_source": "Signature"}, timeout=2)
+                print(f"Ingestion result: {resp.status_code}")
+            except Exception as e:
+                print(f"Ingestion failed: {e}")
+                import traceback
+                traceback.print_exc()
             return JSONResponse(status_code=403, content={"detail": "Blocked by signature", "id": sig_id})
 
     # Updated to support new ML Service schema (Notebook replication)
@@ -601,6 +609,10 @@ async def waf_entry(req: Request, path: str):
         log_entry["reason"] = f"ML:{score:.2f} (low)"
         with open(LOG_PATH, "a") as f:
             f.write(json.dumps(log_entry) + "\n")
+        try:
+            httpx.post("http://127.0.0.1:5000/api/ingest_log", json={**log_entry, "severity": "Low", "detection_source": "ML"}, timeout=2)
+        except:
+            pass
         return await forward_upstream(req)
 
     else:
@@ -609,6 +621,10 @@ async def waf_entry(req: Request, path: str):
         log_entry["reason"] = f"ML:{score:.2f} (safe)"
         with open(LOG_PATH, "a") as f:
             f.write(json.dumps(log_entry) + "\n")
+        try:
+            httpx.post("http://127.0.0.1:5000/api/ingest_log", json={**log_entry, "severity": "Low", "detection_source": "Safe"}, timeout=2)
+        except:
+            pass
         return await forward_upstream(req)
 
 

@@ -1,33 +1,34 @@
 // Constants and configuration
+// Only admin role is allowed to access the system
 const ROLE_PERMISSIONS = {
   admin: {
-    pages: ['dashboard', 'threat', 'intelligence', 'rules', 'logs', 'test', 'learning', 'recommendations', 'alerts', 'restrictions', 'signatures', 'reports', 'ai-models', 'syslog', 'user-profiles', 'settings', 'users', 'database'],
+    pages: ['dashboard', 'threat', 'intelligence', 'rules', 'logs', 'test', 'recommendations', 'alerts', 'restrictions', 'signatures', 'reports', 'ai-models', 'syslog', 'user-profiles', 'profile', 'users', 'database'],
     manageRules: true,
   },
-  operator: {
-    pages: ['dashboard', 'threat', 'intelligence', 'rules', 'logs', 'test', 'recommendations', 'alerts', 'restrictions', 'signatures', 'reports', 'ai-models', 'syslog'],
-    manageRules: true,
-  },
-  analyst: {
-    pages: ['dashboard', 'threat', 'intelligence', 'logs', 'test', 'learning', 'recommendations', 'alerts', 'reports', 'ai-models', 'syslog', 'user-profiles'],
+  user: {
+    pages: ['dashboard', 'threat', 'intelligence', 'logs', 'recommendations', 'profile'],
     manageRules: false,
   },
+  analyst: {
+    pages: ['dashboard', 'threat', 'intelligence', 'logs', 'recommendations', 'profile', 'rules', 'alerts', 'reports', 'syslog'],
+    manageRules: true,
+  },
   viewer: {
-    pages: ['dashboard', 'threat', 'intelligence', 'logs', 'test', 'alerts', 'reports', 'ai-models'],
+    pages: ['dashboard', 'threat', 'intelligence', 'logs', 'profile'],
     manageRules: false,
   },
 };
 
 const PAGE_FILE_MAP = {
-  dashboard: (role) => role === 'admin' ? 'admin.html' : 'user.html',
+  dashboard: (role) => role === 'admin' ? 'index.html' : 'user.html',
   threat: 'threat-monitor.html',
   intelligence: 'threat-intelligence.html',
   rules: 'rules-policies.html',
   logs: 'logs.html',
   test: 'test.html',
-  learning: 'learning-loop.html',
+
   recommendations: 'recommendations.html',
-  settings: 'settings.html',
+  profile: 'profile.html',
   users: 'users.html',
 };
 

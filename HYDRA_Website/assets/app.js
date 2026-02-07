@@ -23,12 +23,12 @@ function checkLogin() {
     return false;
   }
   // Prevent non‑admins from loading the admin dashboard and vice versa
-  if (currentFile === 'admin.html' && role !== 'admin') {
+  if (currentFile === 'index.html' && role !== 'admin') {
     window.location.href = 'user.html';
     return false;
   }
   if (currentFile === 'user.html' && role === 'admin') {
-    window.location.href = 'admin.html';
+    window.location.href = 'index.html';
     return false;
   }
   // Ensure the role is known and load its permissions
@@ -38,7 +38,7 @@ function checkLogin() {
     return false;
   }
   // Determine the logical page identifier from the data-page attribute. All
-  // dashboard pages (admin.html, user.html, index.html) share the
+  // dashboard pages (index.html, user.html, index.html) share the
   // identifier 'dashboard'.
   const currentPage = document.body.dataset.page;
   // If the current page is not permitted for this role, redirect to the
@@ -48,13 +48,12 @@ function checkLogin() {
   if (currentPage && perms.pages.indexOf(currentPage) === -1) {
     const targetView = perms.pages[0];
     const fileMap = {
-      dashboard: role === 'admin' ? 'admin.html' : 'user.html',
+      dashboard: role === 'admin' ? 'index.html' : 'user.html',
       threat: 'threat-monitor.html',
       intelligence: 'threat-intelligence.html',
       rules: 'rules-policies.html',
       logs: 'logs.html',
       test: 'test.html',
-      learning: 'learning-loop.html',
       recommendations: 'recommendations.html',
       settings: 'settings.html',
       users: 'users.html',
@@ -170,7 +169,6 @@ async function loadSidebar() {
           </a>
         </li>
         <li>
-          <a href="learning-loop.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="learning">
             <i data-feather="refresh-cw" class="mr-3"></i>
             <span>Learning Loop</span>
           </a>
@@ -254,7 +252,7 @@ function filterNavByRole() {
   const dashLink = document.querySelector('.nav-link[data-view="dashboard"]');
   if (dashLink) {
     if (role === 'admin') {
-      dashLink.setAttribute('href', 'admin.html');
+      dashLink.setAttribute('href', 'index.html');
     } else {
       dashLink.setAttribute('href', 'user.html');
     }

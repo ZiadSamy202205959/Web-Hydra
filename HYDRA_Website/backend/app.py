@@ -1,4 +1,5 @@
 import os
+import json
 import time
 import secrets
 import csv
@@ -119,7 +120,9 @@ def signup():
     if User.query.filter_by(email=email).first():
         return jsonify({'error': 'Email already exists'}), 409
     
-    user = User(username=username, email=email, role='user')
+    # Create user with provided role or default to 'user'
+    role = data.get('role', 'user')
+    user = User(username=username, email=email, role=role)
     user.set_password(password)
     
     db.session.add(user)
@@ -145,6 +148,9 @@ def login():
     if not user or not user.check_password(password):
         return jsonify({'success': False, 'message': 'Invalid credentials'}), 401
     
+    # Allow all valid roles to access the system
+    # (Role-based access control can be implemented on specific pages)
+    
     token = jwt.encode({
         'user_id': user.user_id,
         'exp': datetime.utcnow() + timedelta(hours=24)
@@ -155,6 +161,134 @@ def login():
         'token': token,
         'user': user.to_dict()
     })
+
+
+# ==================== DASHBOARD ENDPOINTS ====================
+
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    return jsonify({'status': 'healthy', 'timestamp': datetime.utcnow().isoformat()})
+
+
+@app.route('/api/kpis', methods=['GET'])
+def get_kpis():
+    """Get dashboard KPI metrics from real database data"""
+    from sqlalchemy import func
+    
+    # Total requests (WAF logs)
+    total_requests = WAFLog.query.count()
+    
+    # Blocked attacks (alerts with blocked status or severity >= High)
+    blocked_attacks = Alert.query.filter(Alert.status == 'open').count()
+    
+    # False positives (whitelisted requests)
+    false_positives = WhiteListedRequest.query.count()
+    
+    # Model confidence (from Model table or default 87%)
+    model = Model.query.first()
+    model_confidence = model.model_threshold if model and model.model_threshold else 0.87
+    
+    return jsonify({
+        'totalRequests': total_requests,
+        'blockedAttacks': blocked_attacks,
+        'falsePositives': false_positives,
+        'modelConfidence': model_confidence
+    })
+
+
+@app.route('/api/logs', methods=['GET'])
+def get_logs():
+    """Get WAF logs for the logs page"""
+    limit = request.args.get('limit', 100, type=int)
+    offset = request.args.get('offset', 0, type=int)
+    
+    logs = WAFLog.query.order_by(WAFLog.wlog_timestamp.desc()).offset(offset).limit(limit).all()
+    total = WAFLog.query.count()
+    
+    return jsonify({
+        'logs': [log.to_dict() for log in logs],
+        'total': total
+    })
+
+
+@app.route('/api/traffic', methods=['GET'])
+def get_traffic():
+    """Get traffic data for the last 30 days"""
+    from sqlalchemy import func
+    
+    # Get daily request counts for the last 30 days
+    cutoff = datetime.utcnow() - timedelta(days=30)
+    
+    daily_counts = db.session.query(
+        func.date(WAFLog.wlog_timestamp).label('date'),
+        func.count(WAFLog.wlog_id).label('count')
+    ).filter(
+        WAFLog.wlog_timestamp >= cutoff
+    ).group_by(
+        func.date(WAFLog.wlog_timestamp)
+    ).order_by(
+        func.date(WAFLog.wlog_timestamp)
+    ).all()
+    
+    # Fill in missing days with 0
+    traffic_data = []
+    if daily_counts:
+        for i in range(30):
+            day = (datetime.utcnow() - timedelta(days=29-i)).date()
+            count = next((c.count for c in daily_counts if c.date == day), 0)
+            traffic_data.append(count)
+    else:
+        traffic_data = [0] * 30
+    
+    return jsonify({'trafficData': traffic_data})
+
+
+@app.route('/api/owasp', methods=['GET'])
+def get_owasp():
+    """Get OWASP attack type breakdown"""
+    from sqlalchemy import func
+    
+    # Count attacks by type
+    type_counts = db.session.query(
+        WAFLog.wlog_type,
+        func.count(WAFLog.wlog_id).label('count')
+    ).group_by(WAFLog.wlog_type).all()
+    
+    owasp_counts = {tc.wlog_type: tc.count for tc in type_counts}
+    
+    # If no data, return empty dict
+    return jsonify(owasp_counts if owasp_counts else {})
+
+
+@app.route('/api/heatmap', methods=['GET'])
+def get_heatmap():
+    """Get anomaly heatmap data (7 days x 24 hours)"""
+    from sqlalchemy import func
+    
+    # Get hourly counts for the last 7 days
+    cutoff = datetime.utcnow() - timedelta(days=7)
+    
+    hourly_data = db.session.query(
+        func.strftime('%w', WAFLog.wlog_timestamp).label('day'),
+        func.strftime('%H', WAFLog.wlog_timestamp).label('hour'),
+        func.count(WAFLog.wlog_id).label('count')
+    ).filter(
+        WAFLog.wlog_timestamp >= cutoff
+    ).group_by(
+        func.strftime('%w', WAFLog.wlog_timestamp),
+        func.strftime('%H', WAFLog.wlog_timestamp)
+    ).all()
+    
+    # Build 7x24 heatmap matrix (normalized 0-1)
+    heatmap = [[0]*24 for _ in range(7)]
+    max_count = max((h.count for h in hourly_data), default=1)
+    
+    for h in hourly_data:
+        day = int(h.day)
+        hour = int(h.hour)
+        heatmap[day][hour] = h.count / max_count if max_count > 0 else 0
+    
+    return jsonify({'heatmap': heatmap})
 
 
 # ==================== ALERTS ENDPOINTS ====================
@@ -568,6 +702,13 @@ def ingest_log():
         )
         db.session.add(alert)
         db.session.commit()
+    
+    # Add System Log for activity
+    sys_log = SysLog(
+        message=f"Ingested {waf_log.severity} severity WAF log: {waf_log.wlog_type}"
+    )
+    db.session.add(sys_log)
+    db.session.commit()
     
     return jsonify({'success': True, 'wlog_id': waf_log.wlog_id})
 

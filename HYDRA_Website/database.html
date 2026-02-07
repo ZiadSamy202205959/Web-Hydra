@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Hydra – Database Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/tailwind.min.css">
     <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js"></script>
     <link rel="stylesheet" href="assets/style.css">
 </head>
@@ -35,25 +35,33 @@
             </header>
             <main class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
                 <!-- Table Selector -->
-                <div class="flex items-center justify-between flex-wrap gap-4">
-                    <div class="flex items-center space-x-4">
-                        <label class="text-sm font-medium">Select Table:</label>
-                        <select id="table-selector"
-                            class="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500">
-                            <option value="user">User</option>
-                            <option value="waf_log">WAF Log</option>
-                            <option value="alert">Alert</option>
-                            <option value="restriction">Restriction</option>
-                            <option value="signature">Signature</option>
-                            <option value="model">Model</option>
-                            <option value="patching_report">Patching Report</option>
-                            <option value="suspicious_user_profile">Suspicious User Profile</option>
-                            <option value="whitelisted_request">Whitelisted Request</option>
-                            <option value="sys_log">System Log</option>
-                        </select>
+                <div class="card p-0 overflow-hidden mb-6">
+                    <div
+                        class="flex items-center p-2 bg-gray-50 dark:bg-gray-800/50 overflow-x-auto no-scrollbar whitespace-nowrap space-x-2">
+                        <button onclick="switchTable('user')" id="tab-user" class="tab-btn active">Users</button>
+                        <button onclick="switchTable('waf_log')" id="tab-waf_log" class="tab-btn">WAF Logs</button>
+                        <button onclick="switchTable('alert')" id="tab-alert" class="tab-btn">Alerts</button>
+                        <button onclick="switchTable('restriction')" id="tab-restriction"
+                            class="tab-btn">Restrictions</button>
+                        <button onclick="switchTable('signature')" id="tab-signature"
+                            class="tab-btn">Signatures</button>
+                        <button onclick="switchTable('model')" id="tab-model" class="tab-btn">AI Models</button>
+                        <button onclick="switchTable('patching_report')" id="tab-patching_report"
+                            class="tab-btn">Reports</button>
+                        <button onclick="switchTable('suspicious_user_profile')" id="tab-suspicious_user_profile"
+                            class="tab-btn">User Profiles</button>
+                        <button onclick="switchTable('whitelisted_request')" id="tab-whitelisted_request"
+                            class="tab-btn">Whitelist</button>
+                        <button onclick="switchTable('sys_log')" id="tab-sys_log" class="tab-btn">System Logs</button>
                     </div>
+                </div>
+
+                <div class="flex items-center justify-between mb-2">
+                    <h3 id="current-table-name"
+                        class="text-lg font-bold text-gray-800 dark:text-gray-100 uppercase tracking-widest">User Table
+                    </h3>
                     <button onclick="showAddModal()"
-                        class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 text-sm flex items-center">
+                        class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 text-sm flex items-center shadow-lg shadow-teal-500/20 transition-all active:scale-95">
                         <i data-feather="plus" class="w-4 h-4 mr-1"></i> Add Record
                     </button>
                 </div>
@@ -101,7 +109,6 @@
         </div>
     </div>
 
-    <script src="data/mock-data.js"></script>
     <script src="services/ApiService.js"></script>
     <script src="services/StorageService.js"></script>
     <script src="utils/constants.js"></script>
@@ -428,11 +435,23 @@
             }
         });
 
-        // Table selector change
-        document.getElementById('table-selector').addEventListener('change', (e) => {
-            currentTable = e.target.value;
+        // Switch table via tabs
+        function switchTable(tableName) {
+            currentTable = tableName;
+
+            // Update UI tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const activeTab = document.getElementById('tab-' + tableName);
+            if (activeTab) activeTab.classList.add('active');
+
+            // Update table name header
+            const schema = TABLE_SCHEMAS[tableName];
+            document.getElementById('current-table-name').textContent = (schema.labels[schema.idField] ? tableName.replace('_', ' ') : tableName) + ' Table';
+
             loadTableData();
-        });
+        }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -445,7 +464,8 @@
 
             if (!checkAdminAccess()) return;
 
-            loadTableData();
+            // Load initial table
+            switchTable('user');
 
             fetch('partials/sidebar.html?v=' + Date.now()).then(r => r.text()).then(html => {
                 document.getElementById('sidebar').innerHTML = html;

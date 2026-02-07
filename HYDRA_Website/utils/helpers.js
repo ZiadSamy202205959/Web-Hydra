@@ -6,35 +6,41 @@ class Helpers {
       return true;
     }
 
+    // Check for valid session
     const role = StorageService.getRole();
-    if (!role) {
+    const token = localStorage.getItem('authToken');
+    const loggedIn = StorageService.getItem('webHydraLoggedIn');
+
+    // Must have token, role, and logged in flag
+    if (!token || !role || loggedIn !== 'true') {
+      StorageService.clearSession();
       window.location.href = 'login.html';
       return false;
     }
 
-    if (currentFile === 'admin.html' && role !== 'admin') {
-      window.location.href = 'user.html';
+    // Role-based dashboard redirection
+    if (currentFile === 'user.html' && role === 'admin') {
+      window.location.href = 'index.html';
       return false;
     }
 
-    if (currentFile === 'user.html' && role === 'admin') {
-      window.location.href = 'admin.html';
+    if (currentFile === 'index.html' && role !== 'admin') {
+      window.location.href = 'user.html';
       return false;
     }
 
     const perms = ROLE_PERMISSIONS[role];
     if (!perms) {
+      StorageService.clearSession();
       window.location.href = 'login.html';
       return false;
     }
 
     const currentPage = document.body.dataset.page;
-    if (currentPage && perms.pages.indexOf(currentPage) === -1) {
-      const targetView = perms.pages[0];
-      const targetFile = typeof PAGE_FILE_MAP[targetView] === 'function'
-        ? PAGE_FILE_MAP[targetView](role)
-        : PAGE_FILE_MAP[targetView] || 'login.html';
-      window.location.href = targetFile;
+    // Allow dashboard access for everyone (mapped to correct file above)
+    if (currentPage && currentPage !== 'dashboard' && perms.pages.indexOf(currentPage) === -1) {
+      // Redirect to their appropriate dashboard if trying to access unauthorized page
+      window.location.href = role === 'admin' ? 'index.html' : 'user.html';
       return false;
     }
 
@@ -72,29 +78,20 @@ class Helpers {
             </a>
           </li>
           <li>
-            <a href="rules-policies.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="rules">
-              <i data-feather="shield" class="mr-3"></i>
-              <span>Rules &amp; Policies</span>
-            </a>
-          </li>
-          <li>
             <a href="logs.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="logs">
               <i data-feather="file-text" class="mr-3"></i>
               <span>Logs</span>
             </a>
           </li>
+          <!-- WAF Test Suite hidden by user request -->
+          <!-- 
           <li>
             <a href="test.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="test">
               <i data-feather="play-circle" class="mr-3"></i>
               <span>WAF Test Suite</span>
             </a>
           </li>
-          <li>
-            <a href="learning-loop.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="learning">
-              <i data-feather="refresh-cw" class="mr-3"></i>
-              <span>Learning Loop</span>
-            </a>
-          </li>
+          -->
           <li>
             <a href="recommendations.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="recommendations">
               <i data-feather="thumbs-up" class="mr-3"></i>
@@ -102,74 +99,42 @@ class Helpers {
             </a>
           </li>
           <li>
-            <a href="alerts.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="alerts">
-              <i data-feather="bell" class="mr-3"></i>
-              <span>Alerts</span>
+            <a href="database.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="database">
+              <i data-feather="database" class="mr-3"></i>
+              <span>Database Admin</span>
             </a>
           </li>
           <li>
-            <a href="restrictions.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="restrictions">
-              <i data-feather="slash" class="mr-3"></i>
-              <span>Restrictions</span>
-            </a>
-          </li>
-          <li>
-            <a href="signatures.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="signatures">
-              <i data-feather="code" class="mr-3"></i>
-              <span>Signatures</span>
-            </a>
-          </li>
-          <li>
-            <a href="reports.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="reports">
-              <i data-feather="file-text" class="mr-3"></i>
-              <span>Reports</span>
-            </a>
-          </li>
-          <li>
-            <a href="ai-models.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="ai-models">
-              <i data-feather="cpu" class="mr-3"></i>
-              <span>AI Models</span>
-            </a>
-          </li>
-          <li>
-            <a href="syslog.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="syslog">
-              <i data-feather="terminal" class="mr-3"></i>
-              <span>System Logs</span>
-            </a>
-          </li>
-          <li>
-            <a href="user-profiles.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="user-profiles">
-              <i data-feather="user-x" class="mr-3"></i>
-              <span>User Profiles</span>
-            </a>
-          </li>
-          <li>
-            <a href="users.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="users">
-              <i data-feather="users" class="mr-3"></i>
-              <span>User Management</span>
-            </a>
-          </li>
-          <li>
-            <a href="settings.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="settings">
-              <i data-feather="settings" class="mr-3"></i>
-              <span>Settings</span>
+            <a href="profile.html" class="nav-link flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition" data-view="profile">
+              <i data-feather="user" class="mr-3"></i>
+              <span>Profile</span>
             </a>
           </li>
         </ul>
       </nav>
     `;
 
-    try {
-      const response = await fetch('partials/sidebar.html?v=' + Date.now());
-      if (response.ok) {
-        const html = await response.text();
-        sidebar.innerHTML = html;
-      } else {
-        sidebar.innerHTML = sidebarFallback;
+    // Use sidebar caching for faster page loads
+    const fetchSidebar = async () => {
+      try {
+        const response = await fetch('partials/sidebar.html');
+        if (response.ok) {
+          return await response.text();
+        }
+      } catch (err) {
+        // Ignore fetch errors
       }
-    } catch (err) {
-      sidebar.innerHTML = sidebarFallback;
+      return sidebarFallback;
+    };
+
+    let html;
+    if (typeof SidebarCache !== 'undefined') {
+      html = await SidebarCache.getOrFetch(fetchSidebar);
+    } else {
+      html = await fetchSidebar();
     }
+
+    sidebar.innerHTML = html;
 
     if (typeof feather !== 'undefined') {
       feather.replace();
@@ -192,7 +157,7 @@ class Helpers {
 
     const dashLink = document.querySelector('.nav-link[data-view="dashboard"]');
     if (dashLink) {
-      dashLink.setAttribute('href', role === 'admin' ? 'admin.html' : 'user.html');
+      dashLink.setAttribute('href', role === 'admin' ? 'index.html' : 'user.html');
     }
 
     document.querySelectorAll('.nav-link').forEach((link) => {

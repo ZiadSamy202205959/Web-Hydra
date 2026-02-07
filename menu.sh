@@ -53,7 +53,7 @@ while true; do
             ;;
         6)
             echo -e "\n${BLUE}[*] Tailing logs (Ctrl+C to stop)...${NC}"
-            tail -f dataset/suspicious.jsonl
+            tail -f dataset/traffic.jsonl
             ;;
         0)
             echo -e "\nExiting..."

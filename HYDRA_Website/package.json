@@ -1,0 +1,16 @@
+{
+  "name": "hydra_website",
+  "version": "1.0.0",
+  "description": "A modern web-based dashboard for WebHydra WAF (Web Application Firewall) built with MVC architecture. This frontend provides a comprehensive interface to monitor threats, view logs, manage rules, and analyze security events.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tailwindcss": "^4.1.18"
+  }
+}

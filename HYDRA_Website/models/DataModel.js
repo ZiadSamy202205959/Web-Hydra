@@ -1,7 +1,8 @@
 // Data Model - Manages application data state
 class DataModel {
   constructor() {
-    this.data = window.mockData ? JSON.parse(JSON.stringify(window.mockData)) : {};
+    // Start with empty data - will be populated from API
+    this.data = {};
     this.apiService = new ApiService();
     this.loadPersistedData();
   }
@@ -11,7 +12,7 @@ class DataModel {
     if (storedRules.length && this.data.rules) {
       this.data.rules = this.data.rules.concat(storedRules);
     }
-    
+
     const storedKey = StorageService.getApiKey();
     if (storedKey && this.data) {
       this.data.apiKey = storedKey;
@@ -45,6 +46,10 @@ class DataModel {
 
   getLogs() {
     return this.data.logs || [];
+  }
+
+  getSyslogs() {
+    return this.data.syslogs || [];
   }
 
   getRecommendations() {
@@ -96,6 +101,12 @@ class DataModel {
     }
   }
 
+  setSyslogs(logs) {
+    if (logs) {
+      this.data.syslogs = logs;
+    }
+  }
+
   setApiKey(key) {
     this.data.apiKey = key;
     StorageService.setApiKey(key);
@@ -106,8 +117,8 @@ class DataModel {
     if (!this.data.rules) {
       this.data.rules = [];
     }
-    const newId = this.data.rules.length 
-      ? Math.max(...this.data.rules.map((r) => r.id)) + 1 
+    const newId = this.data.rules.length
+      ? Math.max(...this.data.rules.map((r) => r.id)) + 1
       : 1;
     const newRule = { ...rule, id: newId };
     this.data.rules.push(newRule);
@@ -216,6 +227,12 @@ class DataModel {
     const logs = await this.apiService.fetchLogs(100, 0);
     this.setLogs(logs);
     return logs;
+  }
+
+  async loadRealSyslogs() {
+    const data = await this.apiService.fetchSyslogs(100, 0);
+    this.setSyslogs(data.logs);
+    return data;
   }
 }
 

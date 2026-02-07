@@ -93,12 +93,27 @@ run_ml_tests() {
     fi
     
     # ━━━ Benign URLs (should NOT be detected) ━━━
-    echo -e "\n${PURPLE}━━━ Benign URLs (False Positive Check) ━━━${NC}"
+    echo -e "\n${PURPLE}━━━ Benign URLs (False Positive Check - 20 Safe Requests) ━━━${NC}"
     run_ml_test "Google Search" "benign" "https://google.com/search?q=weather+today"
     run_ml_test "Amazon Product" "benign" "https://amazon.com/dp/B08N5WRWNW"
     run_ml_test "GitHub Repo" "benign" "https://github.com/user/repo/blob/main/README.md"
     run_ml_test "Wikipedia Article" "benign" "https://en.wikipedia.org/wiki/Machine_learning"
     run_ml_test "YouTube Video" "benign" "https://youtube.com/watch?v=dQw4w9WgXcQ"
+    run_ml_test "LinkedIn Profile" "benign" "https://linkedin.com/in/john-doe-123456"
+    run_ml_test "Twitter Post" "benign" "https://twitter.com/user/status/1234567890"
+    run_ml_test "Reddit Thread" "benign" "https://reddit.com/r/programming/comments/abc123/hello"
+    run_ml_test "Stack Overflow" "benign" "https://stackoverflow.com/questions/12345678/how-to-python"
+    run_ml_test "Medium Article" "benign" "https://medium.com/@author/great-article-on-security-abc123"
+    run_ml_test "News Site" "benign" "https://bbc.com/news/technology-12345678"
+    run_ml_test "E-commerce Cart" "benign" "https://shop.example.com/cart?item=shirt&size=M&color=blue"
+    run_ml_test "File Download" "benign" "https://cdn.example.com/downloads/document.pdf"
+    run_ml_test "API Call Normal" "benign" "https://api.example.com/v1/users/123/profile"
+    run_ml_test "Image Gallery" "benign" "https://photos.example.com/gallery/vacation-2024?page=2"
+    run_ml_test "Event Calendar" "benign" "https://calendar.example.com/events?date=2024-12-25&type=holiday"
+    run_ml_test "Job Search" "benign" "https://jobs.example.com/search?keywords=engineer&location=remote"
+    run_ml_test "Blog Post" "benign" "https://blog.example.com/2024/01/15/introduction-to-cybersecurity"
+    run_ml_test "Product Review" "benign" "https://reviews.example.com/product/laptop-model-x?rating=5&sort=recent"
+    run_ml_test "Contact Form" "benign" "https://example.com/contact?name=John&email=john@email.com&subject=inquiry"
     
     # ━━━ SQL Injection ━━━
     echo -e "\n${PURPLE}━━━ SQL Injection ━━━${NC}"

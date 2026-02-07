@@ -30,9 +30,9 @@ const server = http.createServer((req, res) => {
     // Parse URL and remove query string
     let urlPath = req.url.split('?')[0];
 
-    // Default to index.html
+    // Default to login.html (require authentication first)
     if (urlPath === '/') {
-        urlPath = '/index.html';
+        urlPath = '/login.html';
     }
 
     const filePath = path.join(ROOT_DIR, urlPath);

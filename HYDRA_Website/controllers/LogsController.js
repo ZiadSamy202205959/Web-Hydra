@@ -5,6 +5,7 @@ class LogsController {
     this.view = view;
     this.state = {
       page: 1,
+      viewMode: 'waf', // 'waf' or 'sys'
       filters: {
         search: '',
         type: '',
@@ -17,30 +18,46 @@ class LogsController {
 
   async init() {
     await this.loadData();
+    this.view.bindTabHandlers((mode) => this.handleTabChange(mode));
     this.view.bindFilterHandlers((filters) => this.handleFilterChange(filters));
     this.view.bindPaginationHandlers((page) => this.handlePageChange(page));
 
-    // Refresh logs every 30 seconds (reduced from 10s for performance)
+    // Refresh logs every 30 seconds
     this.refreshInterval = setInterval(() => {
       this.loadData();
     }, 30000);
   }
 
   async loadData() {
-    await this.model.loadRealLogs();
+    if (this.state.viewMode === 'waf') {
+      await this.model.loadRealLogs();
+    } else {
+      await this.model.loadRealSyslogs();
+    }
     this.render();
   }
 
   render() {
-    const allLogs = this.model.getLogs();
+    const allLogs = this.state.viewMode === 'waf' ? this.model.getLogs() : this.model.getSyslogs();
     const filteredLogs = this.filterLogs(allLogs);
-    const itemsPerPage = 10;
+    const itemsPerPage = 20; // Increased items per page for better view
     const totalPages = Math.ceil(filteredLogs.length / itemsPerPage) || 1;
     const page = Math.min(Math.max(this.state.page, 1), totalPages);
     const start = (page - 1) * itemsPerPage;
     const pageLogs = filteredLogs.slice(start, start + itemsPerPage);
 
-    this.view.renderLogs(pageLogs, page, totalPages, this.state.filters);
+    this.view.renderLogs(pageLogs, page, totalPages, this.state.viewMode);
+  }
+
+  handleTabChange(mode) {
+    if (this.state.viewMode !== mode) {
+      this.state.viewMode = mode;
+      this.state.page = 1;
+      // Reset filters when switching tabs as they might not apply
+      this.state.filters = { search: '', type: '', severity: '', date: '' };
+      // Clear inputs in view if possible (future enhancement)
+      this.loadData();
+    }
   }
 
   filterLogs(logs) {

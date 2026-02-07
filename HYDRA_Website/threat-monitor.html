@@ -5,14 +5,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Web Hydra – Threat Monitor</title>
+
+  <!-- Preconnect to CDNs for faster loading -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
+  <!-- Shared CSS (load first for instant styling) -->
+  <link rel="stylesheet" href="assets/style.css">
+
   <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/tailwind.min.css">
   <!-- Feather Icons -->
   <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js"></script>
-  <!-- Chart.js (not used directly but included for consistency) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <!-- Shared CSS -->
-  <link rel="stylesheet" href="assets/style.css">
+  <!-- Chart.js (deferred - not critical for initial render) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 
 <body data-page="threat" class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 antialiased">
@@ -101,8 +106,8 @@
       </main>
     </div>
   </div>
-  <!-- Mock data -->
-  <script src="data/mock-data.js"></script>
+  <!-- Page Transitions (load early for smooth navigation) -->
+
 
   <!-- MVC Architecture -->
   <!-- Services -->

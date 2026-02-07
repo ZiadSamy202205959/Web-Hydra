@@ -157,8 +157,8 @@ goto menu
 cls
 echo [*] Viewing recent logs...
 echo.
-if exist proxy\dataset\suspicious.jsonl (
-    type proxy\dataset\suspicious.jsonl
+if exist proxy\dataset\traffic.jsonl (
+    type proxy\dataset\traffic.jsonl
 ) else (
     echo No logs found. Run some requests through the WAF first.
 )

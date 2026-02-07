@@ -8,8 +8,12 @@ class DashboardController {
   }
 
   async init() {
-    await this.loadData();
+    // Initialize DOM structure first
+    this.view.initializeDOM();
     this.view.bindSortHandlers((key) => this.handleSort(key));
+
+    // Load real data (wait for it)
+    await this.loadData();
 
     // Set up auto-refresh (60 seconds)
     this.refreshInterval = setInterval(() => {
@@ -45,4 +49,3 @@ class DashboardController {
     }
   }
 }
-

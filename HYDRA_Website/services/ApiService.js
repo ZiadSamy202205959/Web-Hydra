@@ -1,10 +1,12 @@
-// API Service - Handles all API communication
+// API Service - Handles all API communication with timeout support
 class ApiService {
-  constructor(baseURL = 'http://127.0.0.1:8080/api') {
+  constructor(baseURL = 'http://127.0.0.1:5000/api') {
     this.baseURL = baseURL;
-    // TI Backend URL (Flask)
+    // TI Backend URL (Flask) - same backend
     this.tiBaseURL = 'http://localhost:5000/api/ti';
     this.token = localStorage.getItem('authToken') || null;
+    // Timeout for API calls
+    this.defaultTimeout = 3000;
   }
 
   setToken(token) {
@@ -21,9 +23,27 @@ class ApiService {
     localStorage.removeItem('authToken');
   }
 
+  // Create a fetch with timeout wrapper
+  async fetchWithTimeout(url, options = {}, timeout = this.defaultTimeout) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error;
+    }
+  }
+
   async login(username, password) {
     try {
-      const response = await fetch(`${this.baseURL}/login`, {
+      const response = await this.fetchWithTimeout(`${this.baseURL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -52,7 +72,7 @@ class ApiService {
 
   async fetchKPIs() {
     try {
-      const response = await fetch(`${this.baseURL}/kpis`, { headers: this.getAuthHeaders() });
+      const response = await this.fetchWithTimeout(`${this.baseURL}/kpis`, { headers: this.getAuthHeaders() });
       if (response.ok) {
         return await response.json();
       }
@@ -65,7 +85,7 @@ class ApiService {
 
   async fetchLogs(limit = 100, offset = 0) {
     try {
-      const response = await fetch(`${this.baseURL}/logs?limit=${limit}&offset=${offset}`);
+      const response = await this.fetchWithTimeout(`${this.baseURL}/logs?limit=${limit}&offset=${offset}`);
       if (response.ok) {
         const data = await response.json();
         return data.logs || [];
@@ -76,9 +96,22 @@ class ApiService {
     return [];
   }
 
+  async fetchSyslogs(limit = 100, offset = 0) {
+    try {
+      const response = await this.fetchWithTimeout(`${this.baseURL}/syslogs?limit=${limit}&offset=${offset}`);
+      if (response.ok) {
+        const data = await response.json();
+        return data; // Return full data object to include total count
+      }
+    } catch (error) {
+      console.error('Error fetching syslogs:', error);
+    }
+    return { logs: [], total: 0 };
+  }
+
   async fetchAlerts(limit = 10) {
     try {
-      const response = await fetch(`${this.baseURL}/alerts?limit=${limit}`);
+      const response = await this.fetchWithTimeout(`${this.baseURL}/alerts?limit=${limit}`);
       if (response.ok) {
         const data = await response.json();
         return data.alerts || [];
@@ -91,7 +124,7 @@ class ApiService {
 
   async fetchTraffic() {
     try {
-      const response = await fetch(`${this.baseURL}/traffic`);
+      const response = await this.fetchWithTimeout(`${this.baseURL}/traffic`);
       if (response.ok) {
         const data = await response.json();
         return data.trafficData || [];
@@ -104,7 +137,7 @@ class ApiService {
 
   async fetchOWASP() {
     try {
-      const response = await fetch(`${this.baseURL}/owasp`);
+      const response = await this.fetchWithTimeout(`${this.baseURL}/owasp`);
       if (response.ok) {
         return await response.json();
       }
@@ -116,7 +149,7 @@ class ApiService {
 
   async fetchHeatmap() {
     try {
-      const response = await fetch(`${this.baseURL}/heatmap`);
+      const response = await this.fetchWithTimeout(`${this.baseURL}/heatmap`);
       if (response.ok) {
         const data = await response.json();
         return data.heatmap || [];

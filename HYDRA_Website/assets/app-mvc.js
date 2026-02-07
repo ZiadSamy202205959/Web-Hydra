@@ -10,11 +10,6 @@ async function initializeWebHydra() {
   }
 
   // Initialize models
-  if (!window.mockData) {
-    console.warn('Mock data not loaded. Some features may not work.');
-    window.mockData = {};
-  }
-
   const dataModel = new DataModel();
   const authModel = new AuthModel();
   const userModel = new UserModel();
@@ -54,21 +49,16 @@ async function initializeWebHydra() {
     app = new LogsController(dataModel, view);
     await app.init();
   } else if (page === 'test') {
-    // Test page initialization is handled by test.js
     if (typeof initTest === 'function') {
       initTest();
     }
-  } else if (page === 'learning') {
-    const view = new LearningView();
-    app = new LearningController(dataModel, view);
-    app.init();
   } else if (page === 'recommendations') {
     const view = new RecommendationsView();
     app = new RecommendationsController(dataModel, view, authModel);
     app.init();
-  } else if (page === 'settings') {
-    const view = new SettingsView();
-    app = new SettingsController(dataModel, view);
+  } else if (page === 'profile') {
+    const view = new ProfileView();
+    app = new ProfileController(dataModel, userModel, view);
     app.init();
   } else if (page === 'users') {
     const view = new UsersView();
@@ -93,4 +83,3 @@ if (document.readyState === 'loading') {
 } else {
   initializeWebHydra();
 }
-

@@ -5,14 +5,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Web Hydra – Dashboard</title>
+
+  <!-- Preconnect to CDNs for faster loading -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
+  <!-- Shared CSS (load first for instant styling) -->
+  <link rel="stylesheet" href="assets/style.css">
+
   <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/tailwind.min.css">
   <!-- Feather Icons -->
   <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js"></script>
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <!-- Shared CSS -->
-  <link rel="stylesheet" href="assets/style.css">
+  <!-- Chart.js (deferred) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 
 <body data-page="dashboard" class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 antialiased">
@@ -43,98 +48,14 @@
         </div>
       </header>
 
-      <!-- Page content -->
-      <main class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-        <!-- KPIs -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="card kpi-card animate-fade-in" style="animation-delay: 0s">
-            <div>
-              <h3 class="text-sm text-gray-500 dark:text-gray-400">Total Requests</h3>
-              <p class="kpi-total-requests text-2xl font-semibold mt-1"></p>
-            </div>
-            <div class="kpi-icon">
-              <i data-feather="server"></i>
-            </div>
-          </div>
-          <div class="card kpi-card animate-fade-in" style="animation-delay: 0.1s">
-            <div>
-              <h3 class="text-sm text-gray-500 dark:text-gray-400">Blocked Attacks</h3>
-              <p class="kpi-blocked-attacks text-2xl font-semibold mt-1"></p>
-            </div>
-            <div class="kpi-icon text-red-500 bg-red-100 dark:bg-red-900/30 dark:text-red-400">
-              <i data-feather="shield-off"></i>
-            </div>
-          </div>
-          <div class="card kpi-card animate-fade-in" style="animation-delay: 0.2s">
-            <div>
-              <h3 class="text-sm text-gray-500 dark:text-gray-400">False Positives</h3>
-              <p class="kpi-false-positives text-2xl font-semibold mt-1"></p>
-            </div>
-            <div class="kpi-icon text-orange-500 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-400">
-              <i data-feather="alert-triangle"></i>
-            </div>
-          </div>
-          <div class="card kpi-card animate-fade-in" style="animation-delay: 0.3s">
-            <div>
-              <h3 class="text-sm text-gray-500 dark:text-gray-400">Model Confidence</h3>
-              <p class="kpi-model-confidence text-2xl font-semibold mt-1"></p>
-            </div>
-            <div class="kpi-icon text-blue-500 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400">
-              <i data-feather="check-circle"></i>
-            </div>
-          </div>
-        </div>
-
-        <!-- Charts -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div class="card p-6 animate-fade-in" style="animation-delay: 0.4s">
-            <h3 class="mb-4 font-semibold text-lg">Traffic (Last 30 Days)</h3>
-            <div class="chart-container">
-              <canvas id="traffic-chart"></canvas>
-            </div>
-          </div>
-          <div class="card p-6 animate-fade-in" style="animation-delay: 0.5s">
-            <h3 class="mb-4 font-semibold text-lg">OWASP Threat Distribution</h3>
-            <div class="chart-container">
-              <canvas id="owasp-chart"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <!-- Recent Alerts -->
-        <div class="card p-0 overflow-hidden animate-fade-in" style="animation-delay: 0.6s">
-          <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
-            <h3 class="font-semibold text-lg">Recent Alerts</h3>
-            <div class="flex space-x-2">
-              <button id="alerts-sort-type"
-                class="text-xs font-medium text-teal-600 hover:text-teal-700 uppercase tracking-wider">Sort by
-                Type</button>
-              <button id="alerts-sort-severity"
-                class="text-xs font-medium text-teal-600 hover:text-teal-700 uppercase tracking-wider">Sort by
-                Severity</button>
-            </div>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="data-table text-sm">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Type</th>
-                  <th>Severity</th>
-                  <th>Description</th>
-                  <th>Time</th>
-                </tr>
-              </thead>
-              <tbody id="alerts-table"></tbody>
-            </table>
-          </div>
-        </div>
+      <!-- Page content (dynamically populated by DashboardController) -->
+      <main id="main-content" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
       </main>
     </div>
   </div>
 
-  <!-- Mock data -->
-  <script src="data/mock-data.js"></script>
+  <!-- Page Transitions (load early for smooth navigation) -->
+
 
   <!-- MVC Architecture -->
   <!-- Services -->

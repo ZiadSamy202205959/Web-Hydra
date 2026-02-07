@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Web Hydra – Logs</title>
   <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/tailwind.min.css">
   <!-- Feather Icons -->
   <script src="https://cdn.jsdelivr.net/npm/feather-icons@4.29.0/dist/feather.min.js"></script>
   <!-- Chart.js -->
@@ -43,77 +43,89 @@
       </header>
       <!-- Page content -->
       <main class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-        <main class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-          <h3 class="text-lg font-semibold page-title">System Logs</h3>
-          <!-- Filters -->
-          <div class="card p-6 animate-fade-in" style="animation-delay: 0s">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div>
-                <label class="block text-sm font-medium mb-1">Search</label>
-                <div class="relative">
-                  <i data-feather="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
-                  <input id="logs-search" type="text" placeholder="Search message..." class="input-field pl-9">
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-medium mb-1">Type</label>
-                <select id="logs-type-filter" class="input-field">
-                  <option value="">All Types</option>
-                  <option value="Info">Info</option>
-                  <option value="Warning">Warning</option>
-                  <option value="Attack">Attack</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium mb-1">Severity</label>
-                <select id="logs-severity-filter" class="input-field">
-                  <option value="">All Severities</option>
-                  <option value="Low">Low</option>
-                  <option value="Medium">Medium</option>
-                  <option value="High">High</option>
-                  <option value="Critical">Critical</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium mb-1">Date</label>
-                <input id="logs-date-filter" type="date" class="input-field">
+        <div class="flex items-center justify-between">
+          <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Unified Activity Logs</h2>
+          <div
+            class="flex items-center space-x-1 bg-gray-200/50 dark:bg-gray-800/50 p-1 rounded-lg border border-gray-200 dark:border-gray-700">
+            <button id="tab-waf"
+              class="px-4 py-1.5 text-sm font-medium rounded-md transition-all border-b-2 border-teal-500 text-teal-600 dark:text-teal-400">
+              WAF Logs
+            </button>
+            <button id="tab-sys"
+              class="px-4 py-1.5 text-sm font-medium rounded-md transition-all border-b-2 border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200">
+              System Logs
+            </button>
+          </div>
+        </div>
+        <!-- Filters -->
+        <div class="card p-6 animate-fade-in" style="animation-delay: 0s">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label class="block text-sm font-medium mb-1">Search</label>
+              <div class="relative">
+                <i data-feather="search" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400"></i>
+                <input id="logs-search" type="text" placeholder="Search message..." class="input-field pl-9">
               </div>
             </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Type</label>
+              <select id="logs-type-filter" class="input-field">
+                <option value="">All Types</option>
+                <option value="Info">Info</option>
+                <option value="Warning">Warning</option>
+                <option value="Attack">Attack</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Severity</label>
+              <select id="logs-severity-filter" class="input-field">
+                <option value="">All Severities</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Date</label>
+              <input id="logs-date-filter" type="date" class="input-field">
+            </div>
           </div>
+        </div>
 
-          <!-- Logs table -->
-          <div class="card p-0 overflow-hidden animate-fade-in" style="animation-delay: 0.1s">
-            <div class="overflow-x-auto">
-              <table class="data-table text-sm">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Type</th>
-                    <th>Severity</th>
-                    <th>Message</th>
-                    <th>Time</th>
-                  </tr>
-                </thead>
-                <tbody id="logs-table"></tbody>
-              </table>
-            </div>
-            <!-- Pagination -->
-            <div
-              class="flex items-center justify-between p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-              <button id="logs-prev" class="btn btn-secondary text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                <i data-feather="chevron-left" class="w-4 h-4 mr-1"></i> Prev
-              </button>
-              <span id="logs-page-info" class="text-sm text-gray-500 dark:text-gray-400 font-medium">Page 1</span>
-              <button id="logs-next" class="btn btn-secondary text-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                Next <i data-feather="chevron-right" class="w-4 h-4 ml-1"></i>
-              </button>
-            </div>
+        <!-- Logs table -->
+        <div class="card p-0 overflow-hidden animate-fade-in" style="animation-delay: 0.1s">
+          <div class="overflow-x-auto">
+            <table class="data-table text-sm">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Type</th>
+                  <th>Severity</th>
+                  <th>Message</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="logs-table"></tbody>
+            </table>
           </div>
-        </main>
+          <!-- Pagination -->
+          <div
+            class="flex items-center justify-between p-4 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+            <button id="logs-prev" class="btn btn-secondary text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+              <i data-feather="chevron-left" class="w-4 h-4 mr-1"></i> Prev
+            </button>
+            <span id="logs-page-info" class="text-sm text-gray-500 dark:text-gray-400 font-medium">Page 1</span>
+            <button id="logs-next" class="btn btn-secondary text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+              Next <i data-feather="chevron-right" class="w-4 h-4 ml-1"></i>
+            </button>
+          </div>
+        </div>
+      </main>
     </div>
   </div>
-  <!-- Mock data -->
-  <script src="data/mock-data.js"></script>
+  <!-- Page Transitions (load early for smooth navigation) -->
+
 
   <!-- MVC Architecture -->
   <!-- Services -->
